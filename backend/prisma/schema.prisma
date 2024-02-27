@@ -30,10 +30,10 @@ model JobSeeker{
   id           Int         @id @default(autoincrement())
   user         User        @relation(fields: [user_id],references: [id])
   user_id      Int         @unique
-  resume       String?
-  education    String?
-  experience   String?
-  skills       String?
+  resume       String
+  education    String
+  experience   String
+  skills       String
 }
 
 model Company{
@@ -44,4 +44,21 @@ model Company{
   description        String
   website            String
   location           String?
+  jobListing         JobListing[]
+
+}
+
+
+model JobListing{
+  id                Int            @id  @default(autoincrement())
+  company           Company?       @relation(fields: [company_id],references: [id])
+  company_id        Int            
+  title             String
+  description       String
+  skills_required   String[]
+  salary            Float
+  experience        String
+  startDate         DateTime
+  applyBy           DateTime
+  location          String
 }

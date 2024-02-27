@@ -26,11 +26,9 @@ export const loginCompany = asyncHandler(async (req, res) => {
   const payload = {
     id: isUserExists.id,
   };
-  const accessToken = jwt.sign(
-    payload,
-    process.env.JWT_SECRET_COMPANY_ACCESS_TOKEN,
-    { expiresIn: process.env.JWT_SECRET_COMPANY_ACCESS_TOKEN_EXPIRY }
-  );
+  const accessToken = jwt.sign(payload, process.env.JWT_SECRET_ACCESS_TOKEN, {
+    expiresIn: process.env.JWT_SECRET_ACCESS_TOKEN_EXPIRY,
+  });
   const user = await prisma.user.findFirst({
     where: { email },
     include: { company: true },
@@ -45,10 +43,14 @@ export const loginCompany = asyncHandler(async (req, res) => {
       new ApiResponse(200, "Company successfully loggedin", {
         user: {
           ...payload,
-          company_name: user.company.company_name,
-          description: user.company.description,
-          website: user.company.website,
-          location: user.company.location,
+          username: user.username,
+          email: user.email,
+          company: {
+            company_name: user.company.company_name,
+            description: user.company.description,
+            website: user.company.website,
+            location: user.company.location,
+          },
         },
         accessToken,
       })
@@ -70,10 +72,7 @@ export const registerCompany = asyncHandler(async (req, res) => {
   }
   const userExist = await prisma.user.findFirst({
     where: {
-      OR: {
-        email,
-        username,
-      },
+      OR: [{ email }, { username }],
     },
   });
   if (userExist) {
@@ -87,7 +86,11 @@ export const registerCompany = asyncHandler(async (req, res) => {
       username,
       email,
       password: hashedPassword,
-      role_id: 2,
+      role: {
+        connect: {
+          id: 2,
+        },
+      },
     },
   });
   if (!user) {
@@ -96,11 +99,15 @@ export const registerCompany = asyncHandler(async (req, res) => {
 
   const company = await prisma.company.create({
     data: {
-      user_id: user.id,
       company_name,
       description,
       website,
       location,
+      user: {
+        connect: {
+          id: user.id,
+        },
+      },
     },
   });
   if (!company) {
@@ -109,11 +116,9 @@ export const registerCompany = asyncHandler(async (req, res) => {
   const payload = {
     id: user.id,
   };
-  const accessToken = jwt.sign(
-    payload,
-    process.env.JWT_SECRET_COMPANY_ACCESS_TOKEN,
-    { expiresIn: process.env.JWT_SECRET_COMPANY_ACCESS_TOKEN_EXPIRY }
-  );
+  const accessToken = jwt.sign(payload, process.env.JWT_SECRET_ACCESS_TOKEN, {
+    expiresIn: process.env.JWT_SECRET_ACCESS_TOKEN_EXPIRY,
+  });
   res
     .cookie("accessToken", accessToken, {
       httpOnly: true,
@@ -124,10 +129,14 @@ export const registerCompany = asyncHandler(async (req, res) => {
       new ApiResponse(200, "Company successfully registered", {
         user: {
           ...payload,
-          company_name: company.company_name,
-          description: company.description,
-          website: company.website,
-          location: company.location,
+          username: user.username,
+          email: user.email,
+          company: {
+            company_name: company.company_name,
+            description: company.description,
+            website: company.website,
+            location: company.location,
+          },
         },
         accessToken,
       })
@@ -135,15 +144,40 @@ export const registerCompany = asyncHandler(async (req, res) => {
 });
 
 export const logoutCompany = asyncHandler(async (req, res) => {
+  console.log("logout");
   const options = {
     httpOnly: true,
     secure: true,
   };
   res
     .clearCookie("accessToken", options)
-    .json(new ApiResponse(200, "Logout sucessfully"), {});
+    .json(new ApiResponse(200, "Logout sucessfully", {}));
 });
 
 export const getCurrentCompany = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, "Current User", req.user));
+});
+
+export const updateCompanyDetails = asyncHandler(async (req, res) => {
+  const { company_name, description, website, location } = req.body;
+  const user = await prisma.user.update({
+    where: {
+      id: req.user.id,
+    },
+  });
+  if (!user) {
+    throw new ApiError(400, "User cannot be updated");
+  }
+  const company = await prisma.company.update({
+    where: { id: req.user.id },
+    data: {
+      company_name,
+      description,
+      website,
+      location,
+    },
+  });
+  res
+    .status(200)
+    .json(new ApiResponse(200, "User updated successfully", company));
 });

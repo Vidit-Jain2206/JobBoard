@@ -4,7 +4,6 @@ CREATE TABLE "User" (
     "username" VARCHAR(50) NOT NULL,
     "email" TEXT NOT NULL,
     "password" TEXT NOT NULL,
-    "refreshToken" TEXT NOT NULL,
     "role_id" INTEGER NOT NULL,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
@@ -22,10 +21,10 @@ CREATE TABLE "Role" (
 CREATE TABLE "JobSeeker" (
     "id" SERIAL NOT NULL,
     "user_id" INTEGER NOT NULL,
-    "resume" TEXT,
-    "education" TEXT,
-    "experience" TEXT,
-    "skills" TEXT,
+    "resume" TEXT NOT NULL,
+    "education" TEXT NOT NULL,
+    "experience" TEXT NOT NULL,
+    "skills" TEXT NOT NULL,
 
     CONSTRAINT "JobSeeker_pkey" PRIMARY KEY ("id")
 );
@@ -40,6 +39,22 @@ CREATE TABLE "Company" (
     "location" TEXT,
 
     CONSTRAINT "Company_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "JobListing" (
+    "id" SERIAL NOT NULL,
+    "company_id" INTEGER NOT NULL,
+    "title" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
+    "skills_required" TEXT[],
+    "salary" DOUBLE PRECISION NOT NULL,
+    "expereince" TEXT NOT NULL,
+    "startDate" TIMESTAMP(3) NOT NULL,
+    "applyBy" TIMESTAMP(3) NOT NULL,
+    "location" TEXT NOT NULL,
+
+    CONSTRAINT "JobListing_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -65,3 +80,6 @@ ALTER TABLE "JobSeeker" ADD CONSTRAINT "JobSeeker_user_id_fkey" FOREIGN KEY ("us
 
 -- AddForeignKey
 ALTER TABLE "Company" ADD CONSTRAINT "Company_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "JobListing" ADD CONSTRAINT "JobListing_company_id_fkey" FOREIGN KEY ("company_id") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

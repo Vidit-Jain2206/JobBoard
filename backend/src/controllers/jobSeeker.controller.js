@@ -28,13 +28,9 @@ export const loginJobSeeker = asyncHandler(async (req, res) => {
     id: isUserExists.id,
   };
 
-  const accessToken = jwt.sign(
-    payload,
-    process.env.JWT_SECRET_JOBSEEKER_ACCESS_TOKEN,
-    {
-      expiresIn: process.env.JWT_SECRET_JOBSEEKER_ACCESS_TOKEN_EXPIRY,
-    }
-  );
+  const accessToken = jwt.sign(payload, process.env.JWT_SECRET_ACCESS_TOKEN, {
+    expiresIn: process.env.JWT_SECRET_ACCESS_TOKEN_EXPIRY,
+  });
 
   const user = await prisma.user.findFirst({
     where: { email },
@@ -53,10 +49,12 @@ export const loginJobSeeker = asyncHandler(async (req, res) => {
           ...payload,
           username: user.username,
           email: user.email,
-          resume: user.jobSeeker.resume,
-          experience: user.jobSeeker.experience,
-          education: user.jobSeeker.education,
-          skills: user.jobSeeker.skills,
+          jobSeeker: {
+            resume: user.jobSeeker.resume,
+            experience: user.jobSeeker.experience,
+            education: user.jobSeeker.education,
+            skills: user.jobSeeker.skills,
+          },
         },
         accessToken,
       })
@@ -66,7 +64,15 @@ export const registerJobSeeker = asyncHandler(async (req, res) => {
   const { username, email, password, resume, education, experience, skills } =
     req.body;
 
-  if (!username && !email && !password) {
+  if (
+    !username &&
+    !email &&
+    !password &&
+    !resume &&
+    !education &&
+    !experience &&
+    !skills
+  ) {
     throw new ApiError(400, "All fields are required");
   }
   const existingUser = await prisma.user.findFirst({
@@ -85,17 +91,26 @@ export const registerJobSeeker = asyncHandler(async (req, res) => {
       username,
       email,
       password: hashedPassword,
-      role_id: 1,
+      role: {
+        connect: {
+          id: 1,
+        },
+      },
     },
   });
   // create jobseeker
+
   const jobseeker = await prisma.jobSeeker.create({
     data: {
-      user_id: user.id,
-      resume,
       education,
       experience,
       skills,
+      resume,
+      user: {
+        connect: {
+          id: user.id,
+        },
+      },
     },
   });
   if (!jobseeker) {
@@ -105,13 +120,9 @@ export const registerJobSeeker = asyncHandler(async (req, res) => {
     id: user.id,
   };
 
-  const accessToken = jwt.sign(
-    payload,
-    process.env.JWT_SECRET_JOBSEEKER_ACCESS_TOKEN,
-    {
-      expiresIn: process.env.JWT_SECRET_JOBSEEKER_ACCESS_TOKEN_EXPIRY,
-    }
-  );
+  const accessToken = jwt.sign(payload, process.env.JWT_SECRET_ACCESS_TOKEN, {
+    expiresIn: process.env.JWT_SECRET_ACCESS_TOKEN_EXPIRY,
+  });
 
   res
     .cookie("accessToken", accessToken, {
@@ -123,10 +134,14 @@ export const registerJobSeeker = asyncHandler(async (req, res) => {
       new ApiResponse(200, "user registered successfully", {
         user: {
           ...payload,
-          resume: jobseeker.resume,
-          education: jobseeker.education,
-          experience: jobseeker.experience,
-          skills: jobseeker.skills,
+          username: user.username,
+          email: user.email,
+          jobSeeker: {
+            resume: jobseeker.resume,
+            experience: jobseeker.experience,
+            education: jobseeker.education,
+            skills: jobseeker.skills,
+          },
         },
         accessToken,
       })
@@ -140,9 +155,39 @@ export const logoutJobSeeker = asyncHandler(async (req, res) => {
   };
   res
     .clearCookie("accessToken", options)
-    .json(new ApiResponse(200, "Logout sucessfully"), {});
+    .json(new ApiResponse(200, "Logout sucessfully", {}));
 });
 
 export const getCurrentJobSeeker = asyncHandler((req, res) => {
   res.status(200).json(new ApiResponse(200, "Current User", req.user));
+});
+
+export const updateJobSeekerAccountDetails = asyncHandler(async (req, res) => {
+  const { resume, education, experience, skills } = req.body;
+
+  if (!resume && !education && !experience && !skills) {
+    throw new ApiError(400, "All fields are required");
+  }
+  const user = await prisma.user.findFirst({
+    where: {
+      id: req.user.id,
+    },
+  });
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+  const updatedUser = await prisma.user.update({
+    where: {
+      id: req.user.id,
+    },
+    data: {
+      resume,
+      education,
+      experience,
+      skills,
+    },
+  });
+  res
+    .status(200)
+    .json(new ApiResponse(200, "User updated successfully", updatedUser));
 });
