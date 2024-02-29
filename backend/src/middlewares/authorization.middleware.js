@@ -8,6 +8,7 @@ export const authorizeJobSeeker = asyncHandler(async (req, res, next) => {
     if (user.role_id !== 1) {
       throw new ApiError(401, "Only JobSeekers can access ");
     }
+    console.log("user: " + user);
     const job_seeker = await prisma.user.findUnique({
       where: {
         id: user.id,
@@ -27,6 +28,7 @@ export const authorizeJobSeeker = asyncHandler(async (req, res, next) => {
         },
       },
     });
+    console.log(job_seeker);
     if (!job_seeker) {
       throw new ApiError(404, "Job seeker not found");
     }

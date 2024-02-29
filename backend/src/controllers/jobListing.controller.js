@@ -193,8 +193,51 @@ export const deleteListing = asyncHandler(async (req, res) => {
       id: listingId,
     },
   });
+
   if (!deletedListing) {
     throw new ApiError(400, "Listing not deleted");
   }
   res.status(200).json(new ApiResponse(200, "Listing deleted", deletedListing));
+});
+
+export const getAllMyJobListings = asyncHandler(async (req, res) => {
+  console.log("hello");
+  const listings = await prisma.jobListing.findMany({
+    where: { company: { id: req.user.company.id } },
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      skills_required: true,
+      salary: true,
+      experience: true,
+      startDate: true,
+      applyBy: true,
+      location: true,
+      jobApplication: {
+        select: {
+          user: {
+            select: {
+              username: true,
+              email: true,
+            },
+          },
+          jobListing: true,
+        },
+      },
+    },
+  });
+
+  const newListings = listings.map((listing) => {
+    return {
+      ...listing,
+      applicationCount: listing.jobApplication.length,
+    };
+  });
+  if (!listings) {
+    throw new ApiError(404, "Listings not found");
+  }
+  res
+    .status(200)
+    .json(new ApiResponse(200, "Listings fetched successfully", newListings));
 });
