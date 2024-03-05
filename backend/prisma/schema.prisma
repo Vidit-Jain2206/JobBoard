@@ -34,8 +34,7 @@ model JobSeeker{
   resume       String
   education    String
   experience   String
-  skills       String
-  
+  skills       String[]
 }
 
 model Company{

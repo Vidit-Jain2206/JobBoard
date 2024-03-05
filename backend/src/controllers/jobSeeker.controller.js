@@ -5,7 +5,7 @@ import { prisma } from "../../prisma/index.js";
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-export const loginJobSeeker = asyncHandler(async (req, res) => {
+export const loginJobSeeker = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
   if (!email && !password) {
     throw new ApiError(400, "All fields are required");
@@ -14,14 +14,14 @@ export const loginJobSeeker = asyncHandler(async (req, res) => {
     where: { email },
   });
   if (!isUserExists) {
-    throw new ApiError(400, "Invalid Email");
+    next(new ApiError(400, "Invalid email"));
   }
   const isPasswordMatch = await bcryptjs.compare(
     password,
     isUserExists.password
   );
   if (!isPasswordMatch) {
-    throw new ApiError(400, "Password is incorrect");
+    next(new ApiError(400, "Incorrect password"));
   }
 
   const payload = {
@@ -44,7 +44,7 @@ export const loginJobSeeker = asyncHandler(async (req, res) => {
     .cookie("accessToken", accessToken, options)
     .status(200)
     .json(
-      new ApiResponse(200, "user loggedin successfully", {
+      new ApiResponse(200, "User loggedin successfully", {
         user: {
           ...payload,
           username: user.username,

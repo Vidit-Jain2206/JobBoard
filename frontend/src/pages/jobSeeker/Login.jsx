@@ -1,13 +1,18 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { TiTick } from "react-icons/ti";
-import { toast } from "react-toastify";
 import axios from "axios";
+import { useToast } from "@chakra-ui/react";
+import { useDispatch } from "react-redux";
+import { signInUser } from "../../redux/user/userslice";
 
 const Login = () => {
   const [isEmailValid, setIsEmailValid] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({ email: "", password: "" });
+  const toast = useToast();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const submitForm = async (e) => {
     e.preventDefault();
@@ -18,41 +23,48 @@ const Login = () => {
       return;
     }
     if (!password) {
-      toast.error({
-        message: "Please enter a password",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
+      toast({
+        title: "Password is required",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+        position: "bottom-left",
       });
       return;
     }
-
     try {
-      const { data } = await axios.post("/api/login", {
+      const { data } = await axios.post("/api/v1/job_seeker/login", {
         email: email,
         password: password,
       });
-      console.log(data);
+      dispatch(signInUser(data.data.user));
       // after successful login
       setFormData({
         email: "",
         password: "",
       });
+      toast({
+        title: "Login successful",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+        position: "bottom-left",
+      });
+      navigate("/jobseeker_dashboard");
     } catch (error) {
-      toast.error({
-        message: error.response.data.message,
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
+      toast({
+        title: error.response.data.message,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+        position: "bottom-left",
       });
     }
   };
   return (
     <div className="w-full">
       {/* navbar */}
-      <div className="w-full h-[4.5rem] border-2 border-red-400">
+      <div className="w-full h-[4.5rem] ">
         <div className="p-4 w-[95%] md:w-[90%] xl:w-[60%] h-full  flex flex-row justify-between items-center mx-auto">
           {/* logo */}
           <div className="w-[10rem] h-[2rem]">
@@ -60,12 +72,12 @@ const Login = () => {
           </div>
           {/* redirect page */}
           <button className="">
-            <Link to="company_login">For Employers</Link>
+            <Link to="/company_login">For Employers</Link>
           </button>
         </div>
       </div>
 
-      <div className="bg-[#FAFAFA] border-2 border-yellow-400 min-h-[40rem] h-auto flex items-center justify-center">
+      <div className="bg-[#FAFAFA] min-h-[40rem] h-auto flex items-center justify-center">
         <div className="w-[85%] md:w-[80%] xl:w-[50%] min-h-[30rem] h-[80%] flex flex-wrap flex-col-reverse xl:flex-row gap-0">
           <div className="w-[95%] lg:w-[55%] h-full rounded py-4 mx-auto ">
             <div className="rounded mx-auto w-full lg:p-12 h-full shadow-[0_9px_16px_0_rgba(0,106,194,0.2)]  bg-white ">

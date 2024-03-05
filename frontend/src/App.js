@@ -12,7 +12,6 @@ import JobListing from "./pages/company/JobListing";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ProtectedJobSeekerRoute from "./components/ProtectedJobSeekerRoute";
 import ProtectedCompanyRoute from "./components/ProtectedCompanyRoute";
-import { ToastContainer } from "react-toastify";
 
 function App() {
   return (
@@ -36,7 +35,6 @@ function App() {
           </Route>
         </Route>
       </Routes>
-      <ToastContainer />
     </BrowserRouter>
   );
 }

@@ -6,16 +6,19 @@ import reportWebVitals from "./reportWebVitals";
 import { store, persistor } from "./redux/store.js";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
+import { ChakraProvider } from "@chakra-ui/react";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <PersistGate persistor={persistor}>
-    <Provider store={store}>
-      <React.StrictMode>
-        <App />
-      </React.StrictMode>
-    </Provider>
-  </PersistGate>
+  <ChakraProvider>
+    <PersistGate persistor={persistor}>
+      <Provider store={store}>
+        <React.StrictMode>
+          <App />
+        </React.StrictMode>
+      </Provider>
+    </PersistGate>
+  </ChakraProvider>
 );
 
 reportWebVitals();
