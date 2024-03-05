@@ -99,7 +99,7 @@ export const Register = () => {
           <button className=" font-medium tracking-wide text-md">
             Already Registered?{" "}
             <span className="text-[#275df5] font-semibold hover:underline">
-              <Link to="/company_login"> Login</Link>
+              <Link to="/company/login"> Login</Link>
             </span>{" "}
             here
           </button>

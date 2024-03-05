@@ -70,7 +70,7 @@ const Login = () => {
           </div>
           {/* redirect page */}
           <button className="">
-            <Link to="/company_login">For Employers</Link>
+            <Link to="/company/login">For Employers</Link>
           </button>
         </div>
       </div>
@@ -106,7 +106,7 @@ const Login = () => {
                   Know application status on applied jobs.
                 </li>
               </ul>
-              <Link to="/jobseeker_register">
+              <Link to="/jobseeker/register">
                 <button className="text-[#4a90e2] border-2 text-[0.75rem] lg:text-sm font-semibold border-[#4a90e2] py-2 px-4 rounded mt-4 w-[90%] max-w-[15rem]">
                   Register for Free
                 </button>

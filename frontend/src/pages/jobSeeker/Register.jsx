@@ -104,7 +104,7 @@ const Register = () => {
           <button className=" font-medium tracking-wide text-md">
             Already Registered?{" "}
             <span className="text-[#275df5] font-semibold hover:underline">
-              <Link to="/jobseeker_login"> Login</Link>
+              <Link to="/jobseeker/login"> Login</Link>
             </span>{" "}
             here
           </button>

@@ -69,7 +69,7 @@ export const Login = () => {
           </div>
           {/* redirect page */}
           <button className="">
-            <Link to="/jobSeeker_login">For JobSeekers</Link>
+            <Link to="/jobSeeker/login">For JobSeekers</Link>
           </button>
         </div>
       </div>
@@ -107,7 +107,7 @@ export const Login = () => {
                   Advanced Search Filters
                 </li>
               </ul>
-              <Link to="/company_register">
+              <Link to="/company/register">
                 <button className="text-[#4a90e2] border-2 text-[0.75rem] lg:text-sm font-semibold border-[#4a90e2] py-2 px-4 rounded mt-4 w-[90%] max-w-[15rem]">
                   Register for Free
                 </button>

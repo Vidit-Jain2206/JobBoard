@@ -18,20 +18,19 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/jobseeker_login" element={<Login />} />
-        <Route path="/jobseeker_register" element={<Register />} />
-        <Route path="/company_login" element={<CompanyLogin />} />
-        <Route path="/company_register" element={<CompanyRegister />} />
+        <Route path="/jobseeker/login" element={<Login />} />
+        <Route path="/jobseeker/register" element={<Register />} />
+        <Route path="/company/login" element={<CompanyLogin />} />
+        <Route path="/company/register" element={<CompanyRegister />} />
         <Route element={<ProtectedRoute />}>
-          <Route element={<ProtectedJobSeekerRoute />}>
-            <Route path="/jobseeker_dashboard" element={<Dashboard />} />
-            <Route path="/jobseeker_profile" element={<Profile />} />
-            <Route path="/jobseeker_jobdetails/:id" element={<JobDetails />} />
+          <Route path="/jobseeker" element={<ProtectedJobSeekerRoute />}>
+            <Route path="dashboard" element={<Dashboard />} />
+            <Route path="profile" element={<Profile />} />
+            <Route path="jobdetails/:id" element={<JobDetails />} />
           </Route>
-
-          <Route element={<ProtectedCompanyRoute />}>
-            <Route path="/company_dashboard" element={<CompanyDashboard />} />
-            <Route path="/company_joblisting" element={<JobListing />} />
+          <Route path="/company" element={<ProtectedCompanyRoute />}>
+            <Route path="dashboard" element={<CompanyDashboard />} />
+            <Route path="joblisting" element={<JobListing />} />
           </Route>
         </Route>
       </Routes>
