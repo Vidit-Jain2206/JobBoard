@@ -4,6 +4,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { prisma } from "../../prisma/index.js";
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { uploadOnCloudinary } from "../utils/cloudinary.js";
 
 export const loginJobSeeker = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
@@ -61,20 +62,27 @@ export const loginJobSeeker = asyncHandler(async (req, res, next) => {
     );
 });
 export const registerJobSeeker = asyncHandler(async (req, res) => {
-  const { username, email, password, resume, education, experience, skills } =
-    req.body;
-
+  const { username, email, password, education, experience, skills } = req.body;
   if (
     !username &&
     !email &&
     !password &&
-    !resume &&
     !education &&
     !experience &&
     !skills
   ) {
     throw new ApiError(400, "All fields are required");
   }
+  const resumeLocalPath = req.file?.path;
+  let resumeCloudinaryUrl;
+  if (resumeLocalPath) {
+    resumeCloudinaryUrl = await uploadOnCloudinary(resumeLocalPath);
+    if (!resumeCloudinaryUrl) {
+      throw new ApiError(500, "could not upload it on cloudinary");
+    }
+  }
+
+  const resume = resumeCloudinaryUrl.url;
   const existingUser = await prisma.user.findFirst({
     where: {
       OR: [{ email }, { username }],
@@ -99,12 +107,12 @@ export const registerJobSeeker = asyncHandler(async (req, res) => {
     },
   });
   // create jobseeker
-
+  const newskill = skills.split(",");
   const jobseeker = await prisma.jobSeeker.create({
     data: {
       education,
       experience,
-      skills,
+      skills: newskill,
       resume,
       user: {
         connect: {

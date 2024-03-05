@@ -5,6 +5,7 @@ import axios from "axios";
 import { useToast } from "@chakra-ui/react";
 import { useDispatch } from "react-redux";
 import { signInUser } from "../../redux/user/userslice";
+import { loginJobSeeker } from "../../server/auth.js";
 
 const Login = () => {
   const [isEmailValid, setIsEmailValid] = useState(true);
@@ -33,11 +34,8 @@ const Login = () => {
       return;
     }
     try {
-      const { data } = await axios.post("/api/v1/job_seeker/login", {
-        email: email,
-        password: password,
-      });
-      dispatch(signInUser(data.data.user));
+      const { data } = await loginJobSeeker({ email, password });
+      dispatch(signInUser(data.user));
       // after successful login
       setFormData({
         email: "",

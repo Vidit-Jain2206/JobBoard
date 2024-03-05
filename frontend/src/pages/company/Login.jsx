@@ -1,13 +1,18 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { TiTick } from "react-icons/ti";
-import { toast } from "react-toastify";
-import axios from "axios";
+import { useToast } from "@chakra-ui/react";
+import { useDispatch } from "react-redux";
+import { signInUser } from "../../redux/user/userslice";
+import { loginCompany } from "../../server/auth";
 
 export const Login = () => {
   const [isEmailValid, setIsEmailValid] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({ email: "", password: "" });
+  const toast = useToast();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const submitForm = async (e) => {
     e.preventDefault();
@@ -18,34 +23,38 @@ export const Login = () => {
       return;
     }
     if (!password) {
-      toast.error({
-        message: "Please enter a password",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
+      toast({
+        title: "Password is required",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+        position: "bottom-left",
       });
       return;
     }
-
     try {
-      const { data } = await axios.post("/api/login", {
-        email: email,
-        password: password,
-      });
-      console.log(data);
+      const { data } = await loginCompany({ email, password });
+      dispatch(signInUser(data.user));
       // after successful login
       setFormData({
         email: "",
         password: "",
       });
+      toast({
+        title: "Login successful",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+        position: "bottom-left",
+      });
+      navigate("/company_dashboard");
     } catch (error) {
-      toast.error({
-        message: error.response.data.message,
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
+      toast({
+        title: error.response.data.message,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+        position: "bottom-left",
       });
     }
   };

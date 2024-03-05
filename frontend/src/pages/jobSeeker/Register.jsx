@@ -1,7 +1,11 @@
 import React, { useState } from "react";
 import { TiTick } from "react-icons/ti";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FaArrowRightLong } from "react-icons/fa6";
+import { useToast } from "@chakra-ui/react";
+import { registerJobSeeker } from "../../server/auth";
+import { signInUser } from "../../redux/user/userslice";
+import { useDispatch } from "react-redux";
 
 const Register = () => {
   const [resume, setResume] = useState(null);
@@ -16,22 +20,72 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isEmailValid, setIsEmailValid] = useState(true);
   const [skill, setSkill] = useState("");
-  const submitForm = (event) => {
-    event.preventDefault();
-    if (resume) {
-      // You can perform further actions with the selected PDF file here
-      console.log("Selected PDF file:", resume);
-    } else {
-      alert("Please select a PDF file.");
+  const toast = useToast();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const submitForm = async (e) => {
+    e.preventDefault();
+    const { username, email, password, experience, education, skills } =
+      formData;
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailPattern.test(email)) {
+      setIsEmailValid(false);
+      return;
+    }
+    if (
+      !resume ||
+      !username ||
+      !email ||
+      !password ||
+      !experience ||
+      !education ||
+      !skills
+    ) {
+      toast({
+        title: "All fields are required",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+        position: "bottom-left",
+      });
+    }
+
+    try {
+      const { data } = await registerJobSeeker({ ...formData, resume });
+      dispatch(signInUser(data.user));
+      // after successful login
+      setFormData({
+        username: "",
+        email: "",
+        password: "",
+        education: "",
+        experience: "",
+        skills: [],
+      });
+      setResume(null);
+      toast({
+        title: "Login successful",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+        position: "bottom-left",
+      });
+      navigate("/jobseeker_dashboard");
+    } catch (error) {
+      toast({
+        title: error.response.data.message,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
     }
   };
   const handleFileChange = (event) => {
     const file = event.target.files[0];
-    // Check if the selected file is a PDF
     if (file && file.type === "application/pdf") {
       setResume(file);
     } else {
-      // Clear the selected file if it's not a PDF
       setResume(null);
       alert("Please select a PDF file.");
     }
@@ -260,7 +314,7 @@ const Register = () => {
                     accept=".pdf"
                     onChange={handleFileChange}
                     required
-                  ></input>
+                  />
                 </div>
                 <div className="mb-8 w-full">
                   <label

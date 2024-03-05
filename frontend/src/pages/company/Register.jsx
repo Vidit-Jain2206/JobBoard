@@ -1,7 +1,11 @@
 import React, { useState } from "react";
 import { TiTick } from "react-icons/ti";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FaArrowRightLong } from "react-icons/fa6";
+import { useToast } from "@chakra-ui/react";
+import { useDispatch } from "react-redux";
+import { signInUser } from "../../redux/user/userslice";
+import { registerCompany } from "../../server/auth";
 
 export const Register = () => {
   const [formData, setFormData] = useState({
@@ -15,8 +19,72 @@ export const Register = () => {
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isEmailValid, setIsEmailValid] = useState(true);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const toast = useToast();
 
-  const submitForm = () => {};
+  const submitForm = async (e) => {
+    e.preventDefault();
+    const {
+      username,
+      email,
+      password,
+      company_name,
+      description,
+      website,
+      location,
+    } = formData;
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailPattern.test(email)) {
+      setIsEmailValid(false);
+    }
+    if (
+      !username ||
+      !password ||
+      !email ||
+      !company_name ||
+      !description ||
+      !website ||
+      !location
+    ) {
+      toast({
+        title: "All fields are required",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+        position: "bottom-left",
+      });
+    }
+    try {
+      const { data } = await registerCompany({
+        username,
+        email,
+        password,
+        company_name,
+        description,
+        website,
+        location,
+      });
+      dispatch(signInUser(data.user));
+      // after successful login
+      toast({
+        title: "Registration successful",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+        position: "bottom-left",
+      });
+      navigate("/company_dashboard");
+    } catch (error) {
+      toast({
+        title: error.response.data.message,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+        position: "bottom-left",
+      });
+    }
+  };
 
   return (
     <div className="w-full">

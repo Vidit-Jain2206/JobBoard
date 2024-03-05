@@ -8,10 +8,11 @@ import {
 } from "../controllers/jobSeeker.controller.js";
 import { verifyJWT } from "../middlewares/authentication.middleware.js";
 import { authorizeJobSeeker } from "../middlewares/authorization.middleware.js";
+import { upload } from "../middlewares/multer.middleware.js";
 export const jobSeekerRouter = express.Router();
 
 jobSeekerRouter.post("/login", loginJobSeeker);
-jobSeekerRouter.route("/register").post(registerJobSeeker);
+jobSeekerRouter.post("/register", upload.single("resume"), registerJobSeeker);
 jobSeekerRouter.post("/logout", verifyJWT, authorizeJobSeeker, logoutJobSeeker);
 jobSeekerRouter.get(
   "/current_job_seeker",
