@@ -19,7 +19,6 @@ export const createListing = asyncHandler(async (req, res) => {
     salary,
     experience,
     startDate,
-    applyBy,
     location,
   } = req.body;
   if (
@@ -29,7 +28,6 @@ export const createListing = asyncHandler(async (req, res) => {
     !salary &&
     !experience &&
     !startDate &&
-    !applyBy &&
     !location
   ) {
     throw new ApiError(400, "All fields are required");
@@ -52,7 +50,6 @@ export const createListing = asyncHandler(async (req, res) => {
       salary,
       experience,
       startDate,
-      applyBy,
       location,
       company: {
         connect: {
@@ -102,7 +99,6 @@ export const updateListing = asyncHandler(async (req, res) => {
     salary,
     experience,
     startDate,
-    applyBy,
     location,
   } = req.body;
   if (
@@ -112,7 +108,6 @@ export const updateListing = asyncHandler(async (req, res) => {
     !salary &&
     !experience &&
     !startDate &&
-    !applyBy &&
     !location
   ) {
     throw new ApiError(400, "All fields are required");
@@ -146,7 +141,6 @@ export const updateListing = asyncHandler(async (req, res) => {
       salary,
       experience,
       startDate,
-      applyBy,
       location,
     },
     include: {
@@ -212,7 +206,7 @@ export const getAllMyJobListings = asyncHandler(async (req, res) => {
       salary: true,
       experience: true,
       startDate: true,
-      applyBy: true,
+      createdAt: true,
       location: true,
       jobApplication: {
         select: {

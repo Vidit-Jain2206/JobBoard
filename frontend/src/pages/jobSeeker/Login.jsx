@@ -48,7 +48,7 @@ const Login = () => {
         isClosable: true,
         position: "bottom-left",
       });
-      navigate("/jobseeker_dashboard");
+      navigate("/jobseeker/dashboard");
     } catch (error) {
       toast({
         title: error.response.data.message,

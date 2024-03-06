@@ -71,7 +71,7 @@ const Register = () => {
         isClosable: true,
         position: "bottom-left",
       });
-      navigate("/jobseeker_dashboard");
+      navigate("/jobseeker/dashboard");
     } catch (error) {
       toast({
         title: error.response.data.message,
@@ -293,7 +293,7 @@ const Register = () => {
                     value={formData.experience}
                   >
                     <option value="">Select</option>
-                    <option value="0-1 years">0-1 years</option>
+                    <option value="0-1 years">0-1 year</option>
                     <option value="1-3 years">1-3 years</option>
                     <option value="3-5 years">3-5 years</option>
                     <option value="5+ years">5+ years</option>

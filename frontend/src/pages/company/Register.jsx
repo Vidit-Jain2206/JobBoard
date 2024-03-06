@@ -74,7 +74,7 @@ export const Register = () => {
         isClosable: true,
         position: "bottom-left",
       });
-      navigate("/company_dashboard");
+      navigate("/company/dashboard");
     } catch (error) {
       toast({
         title: error.response.data.message,

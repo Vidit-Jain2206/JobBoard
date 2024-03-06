@@ -8,7 +8,6 @@ const ProtectedJobSeekerRoute = () => {
   const toast = useToast();
 
   if (user.jobSeeker) {
-    console.log("inside ");
     return <Outlet />;
   } else {
     toast({
