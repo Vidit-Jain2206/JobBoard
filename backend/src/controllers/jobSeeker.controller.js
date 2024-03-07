@@ -80,6 +80,8 @@ export const registerJobSeeker = asyncHandler(async (req, res) => {
     if (!resumeCloudinaryUrl) {
       throw new ApiError(500, "could not upload it on cloudinary");
     }
+  } else {
+    throw new ApiError(400, "Please upload resume");
   }
 
   const resume = resumeCloudinaryUrl.url;
@@ -171,11 +173,23 @@ export const getCurrentJobSeeker = asyncHandler((req, res) => {
 });
 
 export const updateJobSeekerAccountDetails = asyncHandler(async (req, res) => {
-  const { resume, education, experience, skills } = req.body;
+  const { education, experience, skills } = req.body;
 
-  if (!resume && !education && !experience && !skills) {
+  if (!education && !experience && !skills) {
     throw new ApiError(400, "All fields are required");
   }
+  const resumeLocalPath = req.file?.path;
+  let resumeCloudinaryUrl;
+  if (resumeLocalPath) {
+    resumeCloudinaryUrl = await uploadOnCloudinary(resumeLocalPath);
+    if (!resumeCloudinaryUrl) {
+      throw new ApiError(500, "could not upload it on cloudinary");
+    }
+  } else {
+    throw new ApiError(400, "Please upload resume");
+  }
+
+  const resume = resumeCloudinaryUrl.url;
   const user = await prisma.user.findFirst({
     where: {
       id: req.user.id,
@@ -194,6 +208,7 @@ export const updateJobSeekerAccountDetails = asyncHandler(async (req, res) => {
       experience,
       skills,
     },
+    include: { jobSeeker: true },
   });
   res
     .status(200)

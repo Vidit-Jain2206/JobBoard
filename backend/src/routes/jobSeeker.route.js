@@ -24,5 +24,6 @@ jobSeekerRouter.patch(
   "/update_job_seeker_details",
   verifyJWT,
   authorizeJobSeeker,
+  upload.single("resume"),
   updateJobSeekerAccountDetails
 );

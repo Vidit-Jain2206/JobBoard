@@ -5,6 +5,9 @@ const storage = multer.diskStorage({
     cb(null, "./public/temp");
   },
   filename: function (req, file, cb) {
+    if (!file) {
+      throw new Error("Resume is required");
+    }
     cb(null, file.originalname);
   },
 });

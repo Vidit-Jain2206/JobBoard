@@ -26,7 +26,7 @@ export const registerJobSeeker = async ({
   formData.append("education", education);
   formData.append("skills", skills);
   formData.append("resume", resume);
-  console.log(skills);
+
   const { data } = await axios.post("/api/v1/job_seeker/register", formData, {
     headers: {
       "Content-Type": "multipart/form-data",

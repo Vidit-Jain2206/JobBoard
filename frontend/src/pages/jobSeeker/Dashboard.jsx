@@ -1,6 +1,5 @@
 import {
   Avatar,
-  Link,
   Menu,
   MenuButton,
   MenuDivider,
@@ -13,8 +12,11 @@ import ProfilePopUp from "../../components/ProfilePopUp";
 import JobListing from "../../components/JobListing";
 import { getAllJobListings } from "../../server/JobListings";
 import Filters from "../../components/Filters";
+import { Link } from "react-router-dom";
 
 const Dashboard = () => {
+  const { user } = useSelector((state) => state.user);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const done = useRef(true);
   const [listings, setListings] = useState([
     {
@@ -80,8 +82,15 @@ const Dashboard = () => {
       ignore = true;
     };
   }, []);
-  const { user } = useSelector((state) => state.user);
-  const handleLogout = () => {};
+
+  const handleDropdownToggle = () => {
+    setIsDropdownOpen(!isDropdownOpen);
+  };
+
+  const handleLogout = () => {
+    // Your logout logic here
+    console.log("Logged out");
+  };
 
   return (
     <div className="w-full">
@@ -93,21 +102,31 @@ const Dashboard = () => {
             <img src="" alt="" className="w-full h-full" />
           </div>
           {/* redirect page */}
-          <Menu>
-            <MenuButton>
+          <div className="relative">
+            <button
+              className="text-white focus:outline-none"
+              onClick={handleDropdownToggle}
+            >
               <Avatar name={user.username} size="sm" cursor="pointer"></Avatar>
-            </MenuButton>
-            <MenuList>
-              <ProfilePopUp user={user}>
-                <MenuItem>
-                  <Link to="/jobseeker/profile">My Profile</Link>
-                </MenuItem>
-              </ProfilePopUp>
-
-              <MenuDivider></MenuDivider>
-              <MenuItem onClick={handleLogout}>Logout</MenuItem>
-            </MenuList>
-          </Menu>
+            </button>
+            {isDropdownOpen && (
+              <div className="absolute top-full right-0 mt-2 w-[10rem] bg-white border border-gray-200 rounded shadow-lg">
+                <Link
+                  to="/jobseeker/profile"
+                  className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
+                  onClick={() => console.log("clicked")}
+                >
+                  My Profile
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="block w-full px-4 py-2 text-left text-gray-800 hover:bg-gray-200"
+                >
+                  Logout
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
