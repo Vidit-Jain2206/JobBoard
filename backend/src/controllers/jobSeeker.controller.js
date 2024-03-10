@@ -109,7 +109,9 @@ export const registerJobSeeker = asyncHandler(async (req, res) => {
     },
   });
   // create jobseeker
+  console.log(skills);
   const newskill = skills.split(",");
+  console.log(newskill);
   const jobseeker = await prisma.jobSeeker.create({
     data: {
       education,

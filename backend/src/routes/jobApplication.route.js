@@ -15,7 +15,7 @@ jobApplicationRouter.post(
   authorizeJobSeeker,
   createJobApplication
 );
-jobApplicationRouter.route("/:id").get(getJobApplication);
+// jobApplicationRouter.route("/:id").get(getJobApplication);
 
 // job seeker ke routes h
 jobApplicationRouter.get(

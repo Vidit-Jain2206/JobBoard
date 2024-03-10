@@ -18,57 +18,13 @@ const Dashboard = () => {
   const { user } = useSelector((state) => state.user);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const done = useRef(true);
-  const [listings, setListings] = useState([
-    {
-      id: "1",
-      company_name: "google",
-      title: "Backend developer",
-      description:
-        "Backend developer Lorem fdvfdnv nfonvjf vnefjnvefv vfevnoenv vfenw",
-      skills_required: [
-        "Nodejs",
-        "express",
-        "react",
-        "mongoDb",
-        "Nodejs",
-        "express",
-        "react",
-        "mongoDb",
-      ],
-      salary: 3000000,
-      location: "Delhi",
-      experience: "0-1 year",
-      startDate: "2023-01-01T00:00:00",
-      createdAt: "2024-02-06T00:00",
-    },
-    {
-      id: "2",
-      company_name: "google",
-      title: "Backend developer",
-      description:
-        "Backend developer Lorem fdvfdnv nfonvjf vnefjnvefv vfevnoenv vfenw",
-      skills_required: [
-        "Nodejs",
-        "express",
-        "react",
-        "mongoDb",
-        "Nodejs",
-        "express",
-        "react",
-        "mongoDb",
-      ],
-      salary: 3000000,
-      location: "Delhi",
-      experience: "0-1 year",
-      startDate: "2023-01-01T00:00:00",
-      createdAt: "2022-02-06T00:00",
-    },
-  ]);
+  const [listings, setListings] = useState([]);
 
   async function fetchAllJobListings(ignore) {
-    const listings = await getAllJobListings();
+    const { data } = await getAllJobListings();
+    console.log(data);
     if (!ignore) {
-      setListings(listings);
+      setListings(data);
     }
   }
   useEffect(() => {
@@ -163,8 +119,8 @@ const Dashboard = () => {
               </select>
             </p>
             <div className="mt-[1rem] flex-col flex items-center justify-center gap-2">
-              {listings.map((listing) => (
-                <JobListing listing={listing} key={listing.id} />
+              {listings?.map((listing) => (
+                <JobListing listing={listing} key={listing.id} flag={true} />
               ))}
             </div>
           </div>

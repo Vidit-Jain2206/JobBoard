@@ -4,7 +4,8 @@ import { LiaRupeeSignSolid } from "react-icons/lia";
 import { IoLocationOutline } from "react-icons/io5";
 import { HiOutlineDocumentText } from "react-icons/hi";
 
-function JobListing({ listing }) {
+function JobListing({ listing, flag }) {
+  console.log("Listing", listing);
   const givenDate = new Date(listing.createdAt);
   const differenceInMs = new Date() - givenDate;
   const millisecondsInDay = 1000 * 60 * 60 * 24;
@@ -13,12 +14,16 @@ function JobListing({ listing }) {
   const monthsAgo = Math.floor(daysAgo / 30);
 
   return (
-    <div className="w-full h-[13rem] flex justify-center items-center bg-white  shadow-[0_6px_12px_rgba(30,10,58,.04)] rounded-3xl cursor-pointer hover:shadow-[0_15px_25px_rgba(30,10,58,.06)] transition duration-200">
+    <div
+      className={`${
+        flag ? "bg-white" : "bg-[#FAFAFA] border-2"
+      } w-full h-auto py-4 flex justify-center items-center  shadow-[0_6px_12px_rgba(30,10,58,.04)] rounded-3xl cursor-pointer hover:shadow-[0_15px_25px_rgba(30,10,58,.06)] transition duration-200`}
+    >
       <div className="w-[94%] h-[95%] flex flex-col justify-center">
         <div className="mb-[1rem]">
           <h2 className="text-lg font-semibold text-black">{listing.title}</h2>
           <h3 className="text-sm font-semibold text-[#474d6a]">
-            {listing.company_name}
+            {listing.company.company_name}
           </h3>
         </div>
 
@@ -52,38 +57,40 @@ function JobListing({ listing }) {
           </div>
         </div>
 
-        <div>
-          {" "}
-          {yearsAgo > 0 ? (
-            yearsAgo > 1 ? (
+        {flag && (
+          <div>
+            {" "}
+            {yearsAgo > 0 ? (
+              yearsAgo > 1 ? (
+                <p className="mt-[0.75rem] text-[13px] font-normal leading-4 text-[#717b9e]">
+                  {yearsAgo}+ Years Ago
+                </p>
+              ) : (
+                <p className="mt-[0.75rem] text-[13px] font-normal leading-4 text-[#717b9e]">
+                  {yearsAgo}+ Year Ago
+                </p>
+              )
+            ) : daysAgo > 30 ? (
+              monthsAgo !== 1 ? (
+                <p className="mt-[0.75rem] text-[13px] font-normal leading-4 text-[#717b9e]">
+                  {monthsAgo}+ Months Ago
+                </p>
+              ) : (
+                <p className="mt-[0.75rem] text-[13px] font-normal leading-4 text-[#717b9e]">
+                  {monthsAgo}+ Month Ago
+                </p>
+              )
+            ) : daysAgo !== 1 ? (
               <p className="mt-[0.75rem] text-[13px] font-normal leading-4 text-[#717b9e]">
-                {yearsAgo}+ Years Ago
+                {daysAgo}+ Days Ago
               </p>
             ) : (
               <p className="mt-[0.75rem] text-[13px] font-normal leading-4 text-[#717b9e]">
-                {yearsAgo}+ Year Ago
+                {daysAgo}+ Day Ago
               </p>
-            )
-          ) : daysAgo > 30 ? (
-            monthsAgo !== 1 ? (
-              <p className="mt-[0.75rem] text-[13px] font-normal leading-4 text-[#717b9e]">
-                {monthsAgo}+ Months Ago
-              </p>
-            ) : (
-              <p className="mt-[0.75rem] text-[13px] font-normal leading-4 text-[#717b9e]">
-                {monthsAgo}+ Month Ago
-              </p>
-            )
-          ) : daysAgo !== 1 ? (
-            <p className="mt-[0.75rem] text-[13px] font-normal leading-4 text-[#717b9e]">
-              {daysAgo}+ Days Ago
-            </p>
-          ) : (
-            <p className="mt-[0.75rem] text-[13px] font-normal leading-4 text-[#717b9e]">
-              {daysAgo}+ Day Ago
-            </p>
-          )}
-        </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

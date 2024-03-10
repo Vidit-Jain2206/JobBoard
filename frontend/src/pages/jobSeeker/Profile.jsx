@@ -1,13 +1,21 @@
 import { Avatar } from "@chakra-ui/react";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { IoBagOutline } from "react-icons/io5";
+import { LiaRupeeSignSolid } from "react-icons/lia";
+import { IoLocationOutline } from "react-icons/io5";
+import { HiOutlineDocumentText } from "react-icons/hi";
 
 import { MdEdit } from "react-icons/md";
 import ProfilePopUp from "../../components/ProfilePopUp";
+import JobListing from "../../components/JobListing";
+import { getAllMyJobApplications } from "../../server/jobApplication";
 const Profile = () => {
+  const done = useRef(true);
   const { user } = useSelector((state) => state.user);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [applications, setApplications] = useState([]);
 
   const handleDropdownToggle = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -17,6 +25,26 @@ const Profile = () => {
     console.log("Logged out");
   };
 
+  const fetchAllJobApplications = async (ignore) => {
+    const { data } = await getAllMyJobApplications();
+
+    if (!ignore) {
+      setApplications(data);
+    }
+  };
+  useEffect(() => {
+    let ignore = false;
+    if (done.current) {
+      fetchAllJobApplications(ignore);
+      done.current = false;
+    }
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
+  console.log(applications);
   return (
     <div className="w-full">
       {/* navbar */}
@@ -103,10 +131,18 @@ const Profile = () => {
               </div>
             </div>
           </div>
-          <div className="w-full p-4 bg-white border-2 rounded-3xl shadow-xl "></div>
+          <div className="w-full p-4 bg-white border-2 rounded-3xl shadow-xl flex flex-col">
+            <h2 className="text-xl font-semibold tracking-wide">
+              My Applications
+            </h2>
+            <ul className="mt-[1rem]">
+              {applications.map((application, index) => (
+                <JobListing key={index} listing={application.jobListing} />
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
-      {/* main section */}
     </div>
   );
 };

@@ -51,7 +51,7 @@ CREATE TABLE "JobListing" (
     "salary" DOUBLE PRECISION NOT NULL,
     "experience" TEXT NOT NULL,
     "startDate" TIMESTAMP(3) NOT NULL,
-    "applyBy" TIMESTAMP(3) NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "location" TEXT NOT NULL,
 
     CONSTRAINT "JobListing_pkey" PRIMARY KEY ("id")
