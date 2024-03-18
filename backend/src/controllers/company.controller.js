@@ -46,6 +46,7 @@ export const loginCompany = asyncHandler(async (req, res) => {
           username: user.username,
           email: user.email,
           company: {
+            id: user.company.id,
             company_name: user.company.company_name,
             description: user.company.description,
             website: user.company.website,
@@ -160,16 +161,21 @@ export const getCurrentCompany = asyncHandler(async (req, res) => {
 
 export const updateCompanyDetails = asyncHandler(async (req, res) => {
   const { company_name, description, website, location } = req.body;
-  const user = await prisma.user.update({
+  const { id } = req.params;
+  const iscompany = await prisma.company.findFirst({
     where: {
-      id: req.user.id,
+      id: Number(id),
     },
   });
-  if (!user) {
-    throw new ApiError(400, "User cannot be updated");
+  if (!iscompany) {
+    throw new ApiError(400, "Company cannot be found");
+  }
+
+  if (iscompany.id !== req.user.company.id) {
+    throw new ApiError(400, "You are not authorized to update this company");
   }
   const company = await prisma.company.update({
-    where: { id: req.user.id },
+    where: { id: req.user.company.id },
     data: {
       company_name,
       description,
@@ -177,7 +183,12 @@ export const updateCompanyDetails = asyncHandler(async (req, res) => {
       location,
     },
   });
-  res
-    .status(200)
-    .json(new ApiResponse(200, "User updated successfully", company));
+  if (!company) {
+    throw new ApiError(400, "Company cannot be updated");
+  }
+  const user = await prisma.user.findUnique({
+    where: { id: req.user.id },
+    include: { company: true },
+  });
+  res.status(200).json(new ApiResponse(200, "User updated successfully", user));
 });

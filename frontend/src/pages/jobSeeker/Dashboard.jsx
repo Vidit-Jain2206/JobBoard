@@ -70,7 +70,6 @@ const Dashboard = () => {
                 <Link
                   to="/jobseeker/profile"
                   className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
-                  onClick={() => console.log("clicked")}
                 >
                   My Profile
                 </Link>
@@ -86,8 +85,8 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <div className="w-full bg-[#FAFAFA] min-h-[40rem] h-auto flex justify-center">
-        <div className="w-[90%] md:w-[85%] xl:w-[50%] min-h-[30rem] h-svh flex flex-row flex-wrap md:flex-row gap-4 mt-[2rem]">
+      <div className="w-full bg-[#FAFAFA] h-[calc(100vh-5rem)] flex justify-center ">
+        <div className="w-[90%] md:w-[85%] xl:w-[50%] h-[95%] flex flex-row flex-wrap md:flex-row gap-4 mt-[2rem] ">
           {/* filters */}
           <div className="w-[95%] md:w-[30%] h-[47rem]">
             <Filters
@@ -97,7 +96,7 @@ const Dashboard = () => {
             />
           </div>
           {/* jobListings */}
-          <div className="w-[95%] md:w-[68%] flex flex-col h-auto">
+          <div className="w-[95%] md:w-[68%] h-[100%] flex flex-col">
             <p className="text-right mb-[1rem] text-sm tracking-wide">
               Sort By
               <select
@@ -118,10 +117,12 @@ const Dashboard = () => {
                 <option value="2">Oldest</option>
               </select>
             </p>
-            <div className="mt-[1rem] flex-col flex items-center justify-center gap-2">
-              {listings?.map((listing) => (
-                <JobListing listing={listing} key={listing.id} flag={true} />
-              ))}
+            <div className=" h-[100%] w-full overflow-y-scroll">
+              <ul className="mt-[1rem] flex flex-col items-center justify-center gap-4">
+                {listings?.map((listing) => (
+                  <JobListing listing={listing} key={listing.id} flag={true} />
+                ))}
+              </ul>
             </div>
           </div>
         </div>

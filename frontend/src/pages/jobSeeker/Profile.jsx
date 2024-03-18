@@ -42,10 +42,10 @@ const Profile = () => {
     };
   }, []);
   return (
-    <div className="w-full">
+    <div className="w-full h-screen flex flex-col">
       {/* navbar */}
       <div className="w-full h-[4.5rem] ">
-        <div className="p-4 w-[95%] md:w-[90%] xl:w-[60%] h-full  flex flex-row justify-between items-center mx-auto">
+        <div className="p-4 w-[95%] md:w-[90%] xl:w-[60%] h-full flex flex-row justify-between items-center mx-auto">
           {/* logo */}
           <div className="w-[10rem] h-[2rem]">
             <img src="" alt="" className="w-full h-full" />
@@ -79,8 +79,8 @@ const Profile = () => {
         </div>
       </div>
 
-      <div className="w-full bg-[#FAFAFA] min-h-[40rem] h-auto flex justify-center">
-        <div className="w-[95%] md:w-[90%] xl:w-[60%] min-h-[30rem] flex flex-wrap md:flex-col gap-4 mt-[2rem]">
+      <div className="w-full min-h-[calc(100vh-5rem)] bg-[#FAFAFA] flex justify-center">
+        <div className="w-[95%] md:w-[90%] xl:w-[60%] min-h-[30rem] flex flex-col gap-4 mt-[2rem]">
           {/* upper part */}
           <div className="w-full p-4 bg-white border-2 rounded-3xl shadow-xl">
             <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 min-h-[10rem]">
@@ -127,11 +127,11 @@ const Profile = () => {
               </div>
             </div>
           </div>
-          <div className="w-full p-4 bg-white border-2 rounded-3xl shadow-xl flex flex-col">
+          <div className="w-full h-full overflow-y-scroll p-4 bg-white border-2 rounded-3xl shadow-xl flex flex-col">
             <h2 className="text-xl font-semibold tracking-wide">
               My Applications
             </h2>
-            <ul className="mt-[1rem]">
+            <ul className="mt-[1rem] flex flex-col gap-2">
               {applications.map((application, index) => (
                 <JobListing key={index} listing={application.jobListing} />
               ))}

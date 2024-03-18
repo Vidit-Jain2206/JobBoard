@@ -33,9 +33,7 @@ const JobDetails = () => {
 
   const fetchJobDetails = useCallback(
     async (ignore) => {
-      console.log(" fetching job details");
       const { data } = await getJobDetailsbyId(id);
-      console.log(data);
       if (!ignore) {
         setDetails(data);
       }

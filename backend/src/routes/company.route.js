@@ -21,7 +21,7 @@ companyRouter.get(
 );
 
 companyRouter.patch(
-  "/update_company_details",
+  "/update_company_details/:id",
   verifyJWT,
   authorizeCompany,
   updateCompanyDetails

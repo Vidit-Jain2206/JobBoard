@@ -5,7 +5,6 @@ import { IoLocationOutline } from "react-icons/io5";
 import { HiOutlineDocumentText } from "react-icons/hi";
 import { Link } from "react-router-dom";
 function JobListing({ listing, flag }) {
-  console.log("Listing", listing);
   const givenDate = new Date(listing.createdAt);
   const differenceInMs = new Date() - givenDate;
   const millisecondsInDay = 1000 * 60 * 60 * 24;
@@ -18,7 +17,7 @@ function JobListing({ listing, flag }) {
       to={`/jobseeker/jobdetails/${listing.id}`}
       className="cursor-pointer w-full"
     >
-      <div
+      <li
         className={`${
           flag ? "bg-white" : "bg-[#FAFAFA] border-2"
         } w-full h-auto py-4 flex justify-center items-center shadow-[0_6px_12px_rgba(30,10,58,.04)] rounded-3xl cursor-pointer hover:shadow-[0_15px_25px_rgba(30,10,58,.06)] transition duration-200`}
@@ -98,7 +97,7 @@ function JobListing({ listing, flag }) {
             </div>
           )}
         </div>
-      </div>
+      </li>
     </Link>
   );
 }

@@ -14,6 +14,7 @@ export const authorizeJobSeeker = asyncHandler(async (req, res, next) => {
         id: user.id,
       },
       select: {
+        id: true,
         username: true,
         email: true,
         role_id: true,
@@ -28,7 +29,6 @@ export const authorizeJobSeeker = asyncHandler(async (req, res, next) => {
         },
       },
     });
-    console.log(job_seeker);
     if (!job_seeker) {
       throw new ApiError(404, "Job seeker not found");
     }
@@ -50,6 +50,7 @@ export const authorizeCompany = asyncHandler(async (req, res, next) => {
         id: user.id,
       },
       select: {
+        id: true,
         username: true,
         email: true,
         role_id: true,

@@ -30,7 +30,7 @@ function App() {
           </Route>
           <Route path="/company" element={<ProtectedCompanyRoute />}>
             <Route path="dashboard" element={<CompanyDashboard />} />
-            <Route path="joblisting" element={<JobListing />} />
+            <Route path="createlisting" element={<JobListing />} />
           </Route>
         </Route>
       </Routes>
