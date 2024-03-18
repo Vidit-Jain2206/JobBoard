@@ -27,7 +27,6 @@ const Profile = () => {
 
   const fetchAllJobApplications = async (ignore) => {
     const { data } = await getAllMyJobApplications();
-
     if (!ignore) {
       setApplications(data);
     }
@@ -38,13 +37,10 @@ const Profile = () => {
       fetchAllJobApplications(ignore);
       done.current = false;
     }
-
     return () => {
       ignore = true;
     };
   }, []);
-
-  console.log(applications);
   return (
     <div className="w-full">
       {/* navbar */}

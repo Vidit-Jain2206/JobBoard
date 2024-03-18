@@ -13,7 +13,7 @@ export const jobListingRouter = express.Router();
 
 jobListingRouter.get("/", getAllListings);
 jobListingRouter.post("/create", verifyJWT, authorizeCompany, createListing);
-jobListingRouter.route("/:id").get(verifyJWT, authorizeCompany, getListing);
+jobListingRouter.route("/:id").get(getListing);
 jobListingRouter
   .route("/update/:id")
   .patch(verifyJWT, authorizeCompany, updateListing);

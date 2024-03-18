@@ -17,7 +17,6 @@ jobApplicationRouter.post(
 );
 // jobApplicationRouter.route("/:id").get(getJobApplication);
 
-// job seeker ke routes h
 jobApplicationRouter.get(
   "/my_applications",
   verifyJWT,

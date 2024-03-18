@@ -195,7 +195,6 @@ export const deleteListing = asyncHandler(async (req, res) => {
 });
 
 export const getAllMyJobListings = asyncHandler(async (req, res) => {
-  console.log("hello");
   const listings = await prisma.jobListing.findMany({
     where: { company: { id: req.user.company.id } },
     select: {

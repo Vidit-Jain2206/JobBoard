@@ -87,7 +87,7 @@ const Dashboard = () => {
       </div>
 
       <div className="w-full bg-[#FAFAFA] min-h-[40rem] h-auto flex justify-center">
-        <div className="w-[90%] md:w-[85%] xl:w-[50%] min-h-[30rem] h-svh flex flex-wrap md:flex-row gap-4 mt-[2rem]">
+        <div className="w-[90%] md:w-[85%] xl:w-[50%] min-h-[30rem] h-svh flex flex-row flex-wrap md:flex-row gap-4 mt-[2rem]">
           {/* filters */}
           <div className="w-[95%] md:w-[30%] h-[47rem]">
             <Filters
@@ -97,7 +97,7 @@ const Dashboard = () => {
             />
           </div>
           {/* jobListings */}
-          <div className="w-[95%] md:w-[68%]  flex-col h-auto">
+          <div className="w-[95%] md:w-[68%] flex flex-col h-auto">
             <p className="text-right mb-[1rem] text-sm tracking-wide">
               Sort By
               <select
