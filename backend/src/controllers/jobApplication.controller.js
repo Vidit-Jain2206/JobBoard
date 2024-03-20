@@ -109,7 +109,7 @@ export const getJobApplication = asyncHandler(async (req, res) => {
 });
 export const getAllMyJobApplications = asyncHandler(async (req, res) => {
   const applications = await prisma.jobApplication.findMany({
-    where: { user_id: { id: req.user.id } },
+    where: { user_id: req.user.id },
     include: {
       user: {
         select: {
