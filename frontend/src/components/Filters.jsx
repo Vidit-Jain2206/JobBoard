@@ -13,7 +13,7 @@ const salary = [
   "6-10 Lakhs",
   "10-15 Lakhs",
   "15-25 Lakhs",
-  "15+ lakhs",
+  "25+ lakhs",
 ];
 const experience = [
   "0-1 year",
@@ -53,7 +53,6 @@ const Filters = ({ originalListing, listings, setListings }) => {
   };
   const applyFilters = (e) => {
     e.preventDefault();
-    console.log(orgListing);
     const filteredItems = orgListing.filter((listing) => {
       return (
         selectedLocation.length === 0 ||

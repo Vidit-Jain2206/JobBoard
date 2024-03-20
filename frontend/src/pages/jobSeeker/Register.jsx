@@ -296,7 +296,8 @@ const Register = () => {
                     <option value="0-1 years">0-1 year</option>
                     <option value="1-3 years">1-3 years</option>
                     <option value="3-5 years">3-5 years</option>
-                    <option value="5+ years">5+ years</option>
+                    <option value="5-10 years">5-10 years</option>
+                    <option value="10+ years">10+ years</option>
                   </select>
                 </div>
                 <div className="mb-8 w-full">
@@ -348,11 +349,13 @@ const Register = () => {
                     />
                   </div>
                   <div className="grid-cols-2 md:grid-cols-12 mt-[0.75rem]">
-                    {formData?.skills?.map((skill) => (
-                      <p className="inline text-gray-500 border-2 mt-[0.5rem] px-3 py-2">
-                        {skill}
-                      </p>
-                    ))}
+                    <ul className="flex flex-row gap-2 flex-wrap">
+                      {formData?.skills?.map((skill) => (
+                        <li className="inline text-gray-500 border-2 mt-[0.5rem] px-3 py-2">
+                          {skill}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 </div>
                 <button

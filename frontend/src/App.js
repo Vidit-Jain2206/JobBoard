@@ -12,6 +12,7 @@ import JobListing from "./pages/company/JobListing";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ProtectedJobSeekerRoute from "./components/ProtectedJobSeekerRoute";
 import ProtectedCompanyRoute from "./components/ProtectedCompanyRoute";
+import CreateListing from "./pages/company/CreateListing";
 
 function App() {
   return (
@@ -30,7 +31,7 @@ function App() {
           </Route>
           <Route path="/company" element={<ProtectedCompanyRoute />}>
             <Route path="dashboard" element={<CompanyDashboard />} />
-            <Route path="createlisting" element={<JobListing />} />
+            <Route path="createlisting" element={<CreateListing />} />
           </Route>
         </Route>
       </Routes>

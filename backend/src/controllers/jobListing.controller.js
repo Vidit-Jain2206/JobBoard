@@ -21,6 +21,15 @@ export const createListing = asyncHandler(async (req, res) => {
     startDate,
     location,
   } = req.body;
+  console.log(
+    title,
+    description,
+    skills_required,
+    salary,
+    experience,
+    startDate,
+    location
+  );
   if (
     !title &&
     !description &&
@@ -61,6 +70,8 @@ export const createListing = asyncHandler(async (req, res) => {
       company: true,
     },
   });
+
+  console.log("listing--------", listing);
   if (!listing) {
     throw new ApiError(400, "Listing not created");
   }
