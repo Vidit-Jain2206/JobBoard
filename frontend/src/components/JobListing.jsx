@@ -4,7 +4,11 @@ import { LiaRupeeSignSolid } from "react-icons/lia";
 import { IoLocationOutline } from "react-icons/io5";
 import { HiOutlineDocumentText } from "react-icons/hi";
 import { Link } from "react-router-dom";
-function JobListing({ listing, flag }) {
+import { MdEdit } from "react-icons/md";
+import { MdDelete } from "react-icons/md";
+import { deleteJobListing } from "../server/JobListings";
+function JobListing({ listing, flag, fetchAgain, setFetchAgain }) {
+  console.log(listing);
   const givenDate = new Date(listing.createdAt);
   const differenceInMs = new Date() - givenDate;
   const millisecondsInDay = 1000 * 60 * 60 * 24;
@@ -12,23 +16,40 @@ function JobListing({ listing, flag }) {
   const yearsAgo = Math.floor(daysAgo / 365);
   const monthsAgo = Math.floor(daysAgo / 30);
 
+  const handleDeleteListing = async () => {
+    // eslint-disable-next-line no-restricted-globals
+    if (confirm("Are you sure you want to delete")) {
+      const { data } = await deleteJobListing(listing.id);
+      console.log(data);
+      alert("successfully deleted");
+      setFetchAgain(!fetchAgain);
+    }
+  };
   return (
     <Link
-      to={`/jobseeker/jobdetails/${listing.id}`}
+      to={`${flag ? `/jobseeker/jobdetails/${listing.id}` : ""}`}
       className="cursor-pointer w-full"
     >
       <li
         className={`${
           flag ? "bg-white" : "bg-[#FAFAFA] border-2"
-        } w-full h-auto py-4 flex justify-center items-center shadow-[0_6px_12px_rgba(30,10,58,.04)] rounded-3xl cursor-pointer hover:shadow-[0_15px_25px_rgba(30,10,58,.06)] transition duration-200`}
+        } relative w-full h-auto py-4 flex justify-center items-center shadow-[0_6px_12px_rgba(30,10,58,.04)] rounded-3xl cursor-pointer hover:shadow-[0_15px_25px_rgba(30,10,58,.06)] transition duration-200`}
       >
+        {flag === undefined && (
+          <div className="absolute top-[10%] right-[2%] w-[3rem] h-[3rem] flex flex-row gap-2">
+            <Link to={`/company/editListing/${listing.id}`}>
+              <MdEdit />
+            </Link>
+            <MdDelete onClick={handleDeleteListing} className="text-red-400" />
+          </div>
+        )}
         <div className="w-[94%] h-[95%] flex flex-col justify-center">
           <div className="mb-[1rem]">
             <h2 className="text-lg font-semibold text-black">
               {listing.title}
             </h2>
             <h3 className="text-sm font-semibold text-[#474d6a]">
-              {listing.company.company_name}
+              {flag !== undefined && listing.company.company_name}
             </h3>
           </div>
 
@@ -62,9 +83,8 @@ function JobListing({ listing, flag }) {
             </div>
           </div>
 
-          {flag && (
+          {(flag === undefined || flag) && (
             <div>
-              {" "}
               {yearsAgo > 0 ? (
                 yearsAgo > 1 ? (
                   <p className="mt-[0.75rem] text-[13px] font-normal leading-4 text-[#717b9e]">
@@ -94,6 +114,10 @@ function JobListing({ listing, flag }) {
                   {daysAgo}+ Day Ago
                 </p>
               )}
+
+              <p className="mt-[0.75rem] text-[13px] font-normal leading-4 text-[#717b9e]">
+                Applicants: {listing.applicationCount}
+              </p>
             </div>
           )}
         </div>

@@ -1,8 +1,10 @@
 import { Avatar } from "@chakra-ui/react";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { CompanyPopup } from "../../components/CompanyPopup";
+import { getAllMyListings } from "../../server/JobListings";
+import JobListing from "../../components/JobListing";
 
 export const Dashboard = () => {
   const { user } = useSelector((state) => state.user);
@@ -10,6 +12,7 @@ export const Dashboard = () => {
   const done = useRef(true);
   const [listings, setListings] = useState([]);
   const [popup, setPopup] = useState(false);
+  const [fetchAgain, setFetchAgain] = useState(false);
   const handleDropdownToggle = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
@@ -18,6 +21,26 @@ export const Dashboard = () => {
     // Your logout logic here
     console.log("Logged out");
   };
+
+  const fetchAllJobLsitings = async (ignore) => {
+    console.log("hello");
+    const { data } = await getAllMyListings();
+    if (!ignore) {
+      setListings(data);
+    }
+  };
+
+  useEffect(() => {
+    let ignore = false;
+
+    if (done.current) {
+      fetchAllJobLsitings(ignore);
+      done.current = false;
+    }
+    return () => {
+      ignore = true;
+    };
+  });
 
   return (
     <div className="w-full relative">
@@ -94,7 +117,11 @@ export const Dashboard = () => {
               <h2 className="text-2xl lg:text-3xl font-bold">My Listings</h2>
               <ul className="mt-[1rem] flex flex-col items-center justify-center gap-4">
                 {listings?.map((listing) => (
-                  <></>
+                  <JobListing
+                    listing={listing}
+                    setFetchAgain={setFetchAgain}
+                    fetchAgain={fetchAgain}
+                  />
                 ))}
               </ul>
             </div>

@@ -1,27 +1,51 @@
 import { Avatar } from "@chakra-ui/react";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { CompanyPopup } from "../../components/CompanyPopup";
 import { FaArrowRightLong } from "react-icons/fa6";
-import { createListing } from "../../server/JobListings";
+import {
+  createListing,
+  getJobDetailsbyId,
+  updateListing,
+} from "../../server/JobListings";
 
-function CreateListing() {
+function CreateListing({ isEditable }) {
   const { user } = useSelector((state) => state.user);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [popup, setPopup] = useState(false);
-  const [skill, setSkill] = useState("");
-
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    skills_required: [],
+    skills_required: "",
     salary: "",
     experience: "",
     startDate: "",
     location: "",
   });
-  console.log("outer", typeof formData.salary);
+  const [skill, setSkill] = useState("");
+  const { id } = useParams();
+  console.log(isEditable);
+
+  const fetchListingById = async () => {
+    const { data } = await getJobDetailsbyId(id);
+    console.log(data);
+    setFormData({
+      title: data.title,
+      description: data.description,
+      skills_required: data.skills_required,
+      salary: data.salary,
+      experience: data.experience,
+      startDate: data.startDate,
+      location: data.location,
+    });
+  };
+  useEffect(() => {
+    if (isEditable) {
+      fetchListingById();
+    }
+  }, []);
+
   const handleDropdownToggle = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
@@ -32,11 +56,15 @@ function CreateListing() {
 
   const submitForm = async (e) => {
     e.preventDefault();
-
     try {
       formData.salary = Number(formData.salary);
-      const { data } = await createListing(formData);
-      alert(data.message);
+      if (!isEditable) {
+        const { data } = await createListing(formData);
+        alert(data.message);
+      } else {
+        const { data } = await updateListing(formData, id);
+        alert(data.message);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -93,7 +121,7 @@ function CreateListing() {
             <h2 className="text-xl lg:text-2xl font-bold">Create Listing</h2>
             <form
               action=""
-              //   onSubmit={submitForm}
+              onSubmit={submitForm}
               className="flex flex-col justify-center items-center w-full mt-[2rem]"
             >
               {/* title */}
@@ -182,14 +210,16 @@ function CreateListing() {
                 </div>
                 <div className="grid-cols-2 md:grid-cols-12 mt-[0.75rem]">
                   <ul className="flex flex-row gap-2 flex-wrap">
-                    {formData?.skills_required?.map((skill, index) => (
-                      <li
-                        key={index}
-                        className="inline text-gray-500 border-2 mt-[0.5rem] px-3 py-2"
-                      >
-                        {skill}
-                      </li>
-                    ))}
+                    {formData &&
+                      formData.skills_required &&
+                      formData?.skills_required?.map((skill, index) => (
+                        <li
+                          key={index}
+                          className="inline text-gray-500 border-2 mt-[0.5rem] px-3 py-2"
+                        >
+                          {skill}
+                        </li>
+                      ))}
                   </ul>
                 </div>
               </div>
@@ -216,7 +246,7 @@ function CreateListing() {
                   value={formData.experience}
                 >
                   <option value="">Select</option>
-                  <option value="0-1 years">0-1 year</option>
+                  <option value="0-1 year">0-1 year</option>
                   <option value="1-3 years">1-3 years</option>
                   <option value="3-5 years">3-5 years</option>
                   <option value="5-10 years">5-10 years</option>
@@ -304,11 +334,10 @@ function CreateListing() {
                 </select>
               </div>
               <button
-                type="button"
-                onClick={submitForm}
+                type="submit"
                 className="mt-2 bg-[#4a90e2] text-white border-2 text-[0.75rem] lg:text-sm font-semibold border-[#4a90e2] py-2 px-4 w-full"
               >
-                Create Listing
+                {isEditable ? "Save Changes" : "Create Listing"}
               </button>
             </form>
           </div>

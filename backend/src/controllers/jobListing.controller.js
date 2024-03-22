@@ -21,15 +21,6 @@ export const createListing = asyncHandler(async (req, res) => {
     startDate,
     location,
   } = req.body;
-  console.log(
-    title,
-    description,
-    skills_required,
-    salary,
-    experience,
-    startDate,
-    location
-  );
   if (
     !title &&
     !description &&
@@ -70,8 +61,6 @@ export const createListing = asyncHandler(async (req, res) => {
       company: true,
     },
   });
-
-  console.log("listing--------", listing);
   if (!listing) {
     throw new ApiError(400, "Listing not created");
   }
@@ -198,16 +187,18 @@ export const deleteListing = asyncHandler(async (req, res) => {
       id: listingId,
     },
   });
+  const deleteApplications = await prisma.jobApplication.delete({
+    id: listingId,
+  });
 
-  if (!deletedListing) {
+  if (!deletedListing && !deleteApplications) {
     throw new ApiError(400, "Listing not deleted");
   }
   res.status(200).json(new ApiResponse(200, "Listing deleted", deletedListing));
 });
-
 export const getAllMyJobListings = asyncHandler(async (req, res) => {
   const listings = await prisma.jobListing.findMany({
-    where: { company: { id: req.user.company.id } },
+    where: { company_id: req.user.company.id },
     select: {
       id: true,
       title: true,

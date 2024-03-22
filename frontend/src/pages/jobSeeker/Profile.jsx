@@ -2,11 +2,6 @@ import { Avatar } from "@chakra-ui/react";
 import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { IoBagOutline } from "react-icons/io5";
-import { LiaRupeeSignSolid } from "react-icons/lia";
-import { IoLocationOutline } from "react-icons/io5";
-import { HiOutlineDocumentText } from "react-icons/hi";
-
 import { MdEdit } from "react-icons/md";
 import ProfilePopUp from "../../components/ProfilePopUp";
 import JobListing from "../../components/JobListing";

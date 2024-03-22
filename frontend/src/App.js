@@ -32,6 +32,10 @@ function App() {
           <Route path="/company" element={<ProtectedCompanyRoute />}>
             <Route path="dashboard" element={<CompanyDashboard />} />
             <Route path="createlisting" element={<CreateListing />} />
+            <Route
+              path="editListing/:id"
+              element={<CreateListing isEditable={true} />}
+            />
           </Route>
         </Route>
       </Routes>

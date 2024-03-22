@@ -11,6 +11,13 @@ import { verifyJWT } from "../middlewares/authentication.middleware.js";
 import { authorizeCompany } from "../middlewares/authorization.middleware.js";
 export const jobListingRouter = express.Router();
 
+jobListingRouter.get(
+  "/my_listings",
+  verifyJWT,
+  authorizeCompany,
+  getAllMyJobListings
+);
+
 jobListingRouter.get("/", getAllListings);
 jobListingRouter.post("/create", verifyJWT, authorizeCompany, createListing);
 jobListingRouter.route("/:id").get(getListing);
@@ -20,10 +27,3 @@ jobListingRouter
 jobListingRouter
   .route("/delete/:id")
   .delete(verifyJWT, authorizeCompany, deleteListing);
-
-jobListingRouter.get(
-  "/my_listings",
-  verifyJWT,
-  authorizeCompany,
-  getAllMyJobListings
-);

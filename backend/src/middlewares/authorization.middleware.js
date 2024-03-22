@@ -42,6 +42,7 @@ export const authorizeJobSeeker = asyncHandler(async (req, res, next) => {
 export const authorizeCompany = asyncHandler(async (req, res, next) => {
   try {
     const user = req.user;
+
     if (user.role_id !== 2) {
       throw new ApiError(401, "Only Company can access ");
     }
