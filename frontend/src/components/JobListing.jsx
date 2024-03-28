@@ -8,7 +8,6 @@ import { MdEdit } from "react-icons/md";
 import { MdDelete } from "react-icons/md";
 import { deleteJobListing } from "../server/JobListings";
 function JobListing({ listing, flag, fetchAgain, setFetchAgain }) {
-  console.log(listing);
   const givenDate = new Date(listing.createdAt);
   const differenceInMs = new Date() - givenDate;
   const millisecondsInDay = 1000 * 60 * 60 * 24;
@@ -20,9 +19,8 @@ function JobListing({ listing, flag, fetchAgain, setFetchAgain }) {
     // eslint-disable-next-line no-restricted-globals
     if (confirm("Are you sure you want to delete")) {
       const { data } = await deleteJobListing(listing.id);
-      console.log(data);
-      alert("successfully deleted");
       setFetchAgain(!fetchAgain);
+      alert("successfully deleted");
     }
   };
   return (
@@ -32,7 +30,7 @@ function JobListing({ listing, flag, fetchAgain, setFetchAgain }) {
     >
       <li
         className={`${
-          flag ? "bg-white" : "bg-[#FAFAFA] border-2"
+          !flag ? "bg-white" : "bg-[#FAFAFA] border-2"
         } relative w-full h-auto py-4 flex justify-center items-center shadow-[0_6px_12px_rgba(30,10,58,.04)] rounded-3xl cursor-pointer hover:shadow-[0_15px_25px_rgba(30,10,58,.06)] transition duration-200`}
       >
         {flag === undefined && (
@@ -115,9 +113,11 @@ function JobListing({ listing, flag, fetchAgain, setFetchAgain }) {
                 </p>
               )}
 
-              <p className="mt-[0.75rem] text-[13px] font-normal leading-4 text-[#717b9e]">
-                Applicants: {listing.applicationCount}
-              </p>
+              {flag === undefined && (
+                <p className="mt-[0.75rem] text-[13px] font-normal leading-4 text-[#717b9e]">
+                  Applicants: {listing.applicationCount}
+                </p>
+              )}
             </div>
           )}
         </div>

@@ -16,8 +16,6 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { FaArrowRightLong } from "react-icons/fa6";
-
-import { BsEyeFill } from "react-icons/bs";
 import { MdEdit } from "react-icons/md";
 import { useState } from "react";
 import { updateJobSeekerAccountDetails } from "../server/jobSeeker";
@@ -29,6 +27,7 @@ const ProfilePopUp = ({ user, children }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [resume, setResume] = useState(null);
   const [skill, setSkill] = useState("");
+  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     education: user.jobSeeker.education,
@@ -46,6 +45,7 @@ const ProfilePopUp = ({ user, children }) => {
   };
 
   const updateChanges = async (e) => {
+    setLoading(true);
     e.preventDefault();
     const { experience, education, skills } = formData;
     try {
@@ -54,10 +54,12 @@ const ProfilePopUp = ({ user, children }) => {
         education,
         skills,
         resume,
+        id: user.jobSeeker.id,
       });
-      console.log(data);
+      setLoading(false);
       dispatch(signInUser(data.user));
     } catch (error) {
+      setLoading(false);
       toast({
         title: error.message,
         status: "error",
@@ -147,7 +149,8 @@ const ProfilePopUp = ({ user, children }) => {
                   <option value="0-1 year">0-1 year</option>
                   <option value="1-3 years">1-3 years</option>
                   <option value="3-5 years">3-5 years</option>
-                  <option value="5+ years">5+ years</option>
+                  <option value="5-10 years">5-10 years</option>
+                  <option value="10+ years">10+ years</option>
                 </select>
               </div>
             </Box>
@@ -202,19 +205,19 @@ const ProfilePopUp = ({ user, children }) => {
                     }}
                   />
                 </div>
-                <div className="text-sm grid-cols-2 md:grid-cols-12 mt-[0.75rem]">
+                <ul className="text-sm flex flex-wrap gap-2 mt-[0.75rem]">
                   {formData?.skills?.map((skill) => (
-                    <p className="inline text-gray-500 border-2 mt-[0.5rem] p-1">
+                    <li className="inline text-gray-500 border-2 mt-[0.5rem] p-1">
                       {skill}
-                    </p>
+                    </li>
                   ))}
-                </div>
+                </ul>
               </div>
             </Box>
           </ModalBody>
 
           <ModalFooter>
-            <Button mr={3} onClick={updateChanges}>
+            <Button mr={3} onClick={updateChanges} disabled={loading}>
               Save Changes
             </Button>
             <Button mr={3} onClick={onClose}>

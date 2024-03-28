@@ -18,12 +18,14 @@ export const Register = () => {
     location: "",
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [isEmailValid, setIsEmailValid] = useState(true);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const toast = useToast();
 
   const submitForm = async (e) => {
+    setLoading(true);
     e.preventDefault();
     const {
       username,
@@ -36,7 +38,9 @@ export const Register = () => {
     } = formData;
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!emailPattern.test(email)) {
+      setLoading(false);
       setIsEmailValid(false);
+      return;
     }
     if (
       !username ||
@@ -47,6 +51,7 @@ export const Register = () => {
       !website ||
       !location
     ) {
+      setLoading(false);
       toast({
         title: "All fields are required",
         status: "error",
@@ -54,6 +59,7 @@ export const Register = () => {
         isClosable: true,
         position: "bottom-left",
       });
+      return;
     }
     try {
       const { data } = await registerCompany({
@@ -67,6 +73,7 @@ export const Register = () => {
       });
       dispatch(signInUser(data.user));
       // after successful login
+      setLoading(false);
       toast({
         title: "Registration successful",
         status: "success",
@@ -76,6 +83,7 @@ export const Register = () => {
       });
       navigate("/company/dashboard");
     } catch (error) {
+      setLoading(false);
       toast({
         title: error.response.data.message,
         status: "error",
@@ -341,6 +349,7 @@ export const Register = () => {
 
                 <button
                   type="submit"
+                  disabled={loading}
                   className="mt-2 bg-[#4a90e2] text-white border-2 text-[0.75rem] lg:text-sm font-semibold border-[#4a90e2] py-2 px-4 w-full"
                 >
                   Register Now

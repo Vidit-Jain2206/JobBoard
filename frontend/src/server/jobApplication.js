@@ -6,10 +6,6 @@ export const getAllMyJobApplications = async () => {
 };
 
 export const createJobApplication = async (id) => {
-  try {
-    const { data } = await axios.post(`/api/v1/job_application/create/${id}`);
-    return data;
-  } catch (error) {
-    throw new Error(error.message);
-  }
+  const { data } = await axios.post(`/api/v1/job_application/create/${id}`);
+  return data;
 };

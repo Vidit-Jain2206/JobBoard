@@ -9,7 +9,6 @@ import JobListing from "../../components/JobListing";
 export const Dashboard = () => {
   const { user } = useSelector((state) => state.user);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const done = useRef(true);
   const [listings, setListings] = useState([]);
   const [popup, setPopup] = useState(false);
   const [fetchAgain, setFetchAgain] = useState(false);
@@ -18,30 +17,17 @@ export const Dashboard = () => {
   };
 
   const handleLogout = () => {
-    // Your logout logic here
     console.log("Logged out");
   };
 
-  const fetchAllJobLsitings = async (ignore) => {
-    console.log("hello");
+  const fetchAllJobLsitings = async () => {
     const { data } = await getAllMyListings();
-    if (!ignore) {
-      setListings(data);
-    }
+    setListings(data);
   };
 
   useEffect(() => {
-    let ignore = false;
-
-    if (done.current) {
-      fetchAllJobLsitings(ignore);
-      done.current = false;
-    }
-    return () => {
-      ignore = true;
-    };
-  });
-
+    fetchAllJobLsitings();
+  }, [fetchAgain]);
   return (
     <div className="w-full relative">
       {/* navbar */}

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { TiTick } from "react-icons/ti";
-import axios from "axios";
 import { useToast } from "@chakra-ui/react";
 import { useDispatch } from "react-redux";
 import { signInUser } from "../../redux/user/userslice";
@@ -10,20 +9,24 @@ import { loginJobSeeker } from "../../server/auth.js";
 const Login = () => {
   const [isEmailValid, setIsEmailValid] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({ email: "", password: "" });
   const toast = useToast();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const submitForm = async (e) => {
+    setLoading(true);
     e.preventDefault();
     const { email, password } = formData;
     const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!emailPattern.test(email)) {
       setIsEmailValid(false);
+      setLoading(false);
       return;
     }
     if (!password) {
+      setLoading(false);
       toast({
         title: "Password is required",
         status: "error",
@@ -41,6 +44,7 @@ const Login = () => {
         email: "",
         password: "",
       });
+      setLoading(false);
       toast({
         title: "Login successful",
         status: "success",
@@ -50,6 +54,7 @@ const Login = () => {
       });
       navigate("/jobseeker/dashboard");
     } catch (error) {
+      setLoading(false);
       toast({
         title: error.response.data.message,
         status: "error",
@@ -62,19 +67,7 @@ const Login = () => {
   return (
     <div className="w-full">
       {/* navbar */}
-      <div className="w-full h-[4.5rem] ">
-        <div className="p-4 w-[95%] md:w-[90%] xl:w-[60%] h-full  flex flex-row justify-between items-center mx-auto">
-          {/* logo */}
-          <div className="w-[10rem] h-[2rem]">
-            <img src="" alt="" className="w-full h-full" />
-          </div>
-          {/* redirect page */}
-          <button className="">
-            <Link to="/company/login">For Employers</Link>
-          </button>
-        </div>
-      </div>
-
+      <Navbar page="login" />
       <div className="bg-[#FAFAFA] min-h-[40rem] h-auto flex items-center justify-center">
         <div className="w-[85%] md:w-[80%] xl:w-[50%] min-h-[30rem] h-[80%] flex flex-wrap flex-col-reverse xl:flex-row gap-0">
           <div className="w-[95%] lg:w-[55%] h-full rounded py-4 mx-auto ">
@@ -181,6 +174,7 @@ const Login = () => {
                   </p>
                 </div>
                 <button
+                  disabled={loading}
                   type="submit"
                   className="mt-2 bg-[#4a90e2] text-white border-2 text-[0.75rem] lg:text-sm font-semibold border-[#4a90e2] py-2 px-4 w-full"
                 >
@@ -195,5 +189,32 @@ const Login = () => {
     </div>
   );
 };
+
+export function Navbar({ page }) {
+  return (
+    <div className="w-full h-[4.5rem]">
+      <div className="p-4 w-[95%] md:w-[90%] xl:w-[60%] h-full  flex flex-row justify-between items-center mx-auto">
+        {/* logo */}
+        <div className="w-[10rem] h-[2rem]">
+          <img src="" alt="" className="w-full h-full" />
+        </div>
+        {/* redirect page */}
+        {page === "login" ? (
+          <button className="">
+            <Link to="/company/login">For Employers</Link>
+          </button>
+        ) : (
+          <button className=" font-medium tracking-wide text-md">
+            Already Registered?{" "}
+            <span className="text-[#275df5] font-semibold hover:underline">
+              <Link to="/jobseeker/login"> Login</Link>
+            </span>{" "}
+            here
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
 
 export default Login;

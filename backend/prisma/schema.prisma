@@ -17,8 +17,6 @@ model User {
   role_id      Int  
   jobSeeker    JobSeeker?
   company      Company?
-  jobApplication JobApplication[]
-  
 }
 
 model Role {
@@ -35,6 +33,7 @@ model JobSeeker{
   education    String
   experience   String
   skills       String[]
+  jobApplication JobApplication[]
 }
 
 model Company{
@@ -67,10 +66,9 @@ model JobListing{
 
 model JobApplication{  
   id                Int           @id @default(autoincrement())
-  applicationDate DateTime        @default(now())   
-  user           User             @relation(fields: [user_id], references: [id])
-  user_id         Int
-  jobListing     JobListing       @relation(fields: [jobListing_id], references: [id])
-  jobListing_id   Int
-  @@unique([user_id, jobListing_id])
+  jobSeeker        JobSeeker      @relation(fields: [jobSeeker_id], references: [id])
+  jobSeeker_id      Int
+  jobListing       JobListing     @relation(fields: [jobListing_id], references: [id])
+  jobListing_id     Int
+  @@unique([jobSeeker_id, jobListing_id])
 }

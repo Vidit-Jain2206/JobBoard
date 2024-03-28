@@ -8,7 +8,6 @@ import { Register as CompanyRegister } from "./pages/company/Register";
 import { Dashboard as CompanyDashboard } from "./pages/company/Dashboard";
 import Profile from "./pages/jobSeeker/Profile";
 import JobDetails from "./pages/jobSeeker/JobDetails";
-import JobListing from "./pages/company/JobListing";
 import ProtectedRoute from "./components/ProtectedRoute";
 import ProtectedJobSeekerRoute from "./components/ProtectedJobSeekerRoute";
 import ProtectedCompanyRoute from "./components/ProtectedCompanyRoute";

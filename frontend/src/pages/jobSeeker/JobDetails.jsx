@@ -1,4 +1,4 @@
-import { Avatar } from "@chakra-ui/react";
+import { useToast } from "@chakra-ui/react";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { IoBagOutline, IoLocationOutline } from "react-icons/io5";
 import { LiaRupeeSignSolid } from "react-icons/lia";
@@ -6,36 +6,65 @@ import { useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom";
 import { getJobDetailsbyId } from "../../server/JobListings";
 import { createJobApplication } from "../../server/jobApplication";
+import Navbar from "../../components/Navbar";
 
 const JobDetails = () => {
   const done = useRef(true);
+  const [loading, setLoading] = useState(false);
   const { user } = useSelector((state) => state.user);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [details, setDetails] = useState({});
   const { id } = useParams();
-
-  const handleDropdownToggle = () => {
-    setIsDropdownOpen(!isDropdownOpen);
-  };
-
-  const handleLogout = () => {
-    console.log("Logged out");
-  };
+  const toast = useToast();
 
   const handleJobApplication = async () => {
     try {
-      const { data } = await createJobApplication(id);
-      console.log(data);
+      setLoading(true);
+      await createJobApplication(id);
+      setLoading(false);
+      toast({
+        title: "Application created successfully",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+        position: "bottom-left",
+      });
     } catch (error) {
-      console.log(error);
+      setLoading(false);
+      toast({
+        title: error.response.data.message,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+        position: "bottom-left",
+      });
     }
   };
 
   const fetchJobDetails = useCallback(
     async (ignore) => {
-      const { data } = await getJobDetailsbyId(id);
-      if (!ignore) {
-        setDetails(data);
+      try {
+        setLoading(true);
+        const { data } = await getJobDetailsbyId(id);
+        setLoading(false);
+        if (!ignore) {
+          setDetails(data);
+        }
+        toast({
+          title: "Job details fetched successfully",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+          position: "bottom-left",
+        });
+      } catch (error) {
+        setLoading(true);
+        toast({
+          title: error.response.data.message,
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+          position: "bottom-left",
+        });
       }
     },
     [id]
@@ -54,40 +83,7 @@ const JobDetails = () => {
 
   return (
     <div className="w-screen h-screen flex flex-col">
-      <div className="w-full h-[4.5rem] ">
-        <div className="p-4 w-[95%] md:w-[90%] xl:w-[60%] h-full  flex flex-row justify-between items-center mx-auto">
-          {/* logo */}
-          <div className="w-[10rem] h-[2rem]">
-            <img src="" alt="" className="w-full h-full" />
-          </div>
-          {/* redirect page */}
-          <div className="relative">
-            <button
-              className="text-white focus:outline-none"
-              onClick={handleDropdownToggle}
-            >
-              <Avatar name={user.username} size="sm" cursor="pointer"></Avatar>
-            </button>
-            {isDropdownOpen && (
-              <div className="absolute top-full right-0 mt-2 w-[10rem] bg-white border border-gray-200 rounded shadow-lg">
-                <Link
-                  to="/jobseeker/profile"
-                  className="block px-4 py-2 text-gray-800 hover:bg-gray-200"
-                  onClick={() => console.log("clicked")}
-                >
-                  My Profile
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  className="block w-full px-4 py-2 text-left text-gray-800 hover:bg-gray-200"
-                >
-                  Logout
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+      <Navbar user={user} />
       <div className="w-full min-h-[calc(100%-4.5rem)] bg-[#FAFAFA] flex justify-center">
         <div className="mt-[4rem] w-[95%] md:w-[90%] xl:w-[60%] h-full grid grid-cols-1 lg:grid-cols-5 gap-4">
           {/* job detail */}
@@ -171,6 +167,7 @@ const JobDetails = () => {
               {/* apply button */}
               <div className="px-4 py-2">
                 <button
+                  disabled={loading}
                   onClick={handleJobApplication}
                   className="w-[10rem] px-5 py-2 rounded-lg border-2 border-[#4a90e2] bg-[#4a90e2] text-white hover:text-[#4a90e2] hover:bg-white "
                 >
@@ -179,9 +176,6 @@ const JobDetails = () => {
               </div>
             </div>
           </div>
-
-          {/* mores job */}
-          <div className=" lg:col-span-2"></div>
         </div>
       </div>
     </div>

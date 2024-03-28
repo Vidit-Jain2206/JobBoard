@@ -5,7 +5,7 @@ import { prisma } from "../../prisma/index.js";
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-export const loginCompany = asyncHandler(async (req, res) => {
+export const loginCompany = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
   if (!email && !password) {
     throw new ApiError(400, "All fields are required");
@@ -58,7 +58,7 @@ export const loginCompany = asyncHandler(async (req, res) => {
     );
 });
 
-export const registerCompany = asyncHandler(async (req, res) => {
+export const registerCompany = asyncHandler(async (req, res, next) => {
   const {
     username,
     email,
@@ -144,7 +144,7 @@ export const registerCompany = asyncHandler(async (req, res) => {
     );
 });
 
-export const logoutCompany = asyncHandler(async (req, res) => {
+export const logoutCompany = asyncHandler(async (req, res, next) => {
   console.log("logout");
   const options = {
     httpOnly: true,
@@ -155,11 +155,11 @@ export const logoutCompany = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, "Logout sucessfully", {}));
 });
 
-export const getCurrentCompany = asyncHandler(async (req, res) => {
+export const getCurrentCompany = asyncHandler(async (req, res, next) => {
   res.status(200).json(new ApiResponse(200, "Current User", req.user));
 });
 
-export const updateCompanyDetails = asyncHandler(async (req, res) => {
+export const updateCompanyDetails = asyncHandler(async (req, res, next) => {
   const { company_name, description, website, location } = req.body;
   const { id } = req.params;
   const iscompany = await prisma.company.findFirst({

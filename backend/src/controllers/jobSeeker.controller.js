@@ -9,7 +9,7 @@ import { uploadOnCloudinary } from "../utils/cloudinary.js";
 export const loginJobSeeker = asyncHandler(async (req, res, next) => {
   const { email, password } = req.body;
   if (!email && !password) {
-    throw new ApiError(400, "All fields are required");
+    next(new ApiError(400, "All fields are required"));
   }
   const isUserExists = await prisma.user.findUnique({
     where: { email },
@@ -51,6 +51,7 @@ export const loginJobSeeker = asyncHandler(async (req, res, next) => {
           username: user.username,
           email: user.email,
           jobSeeker: {
+            id: user.jobSeeker.id,
             resume: user.jobSeeker.resume,
             experience: user.jobSeeker.experience,
             education: user.jobSeeker.education,
@@ -61,7 +62,7 @@ export const loginJobSeeker = asyncHandler(async (req, res, next) => {
       })
     );
 });
-export const registerJobSeeker = asyncHandler(async (req, res) => {
+export const registerJobSeeker = asyncHandler(async (req, res, next) => {
   const { username, email, password, education, experience, skills } = req.body;
   if (
     !username &&
@@ -71,17 +72,17 @@ export const registerJobSeeker = asyncHandler(async (req, res) => {
     !experience &&
     !skills
   ) {
-    throw new ApiError(400, "All fields are required");
+    next(new ApiError(400, "All fields are required"));
   }
   const resumeLocalPath = req.file?.path;
   let resumeCloudinaryUrl;
   if (resumeLocalPath) {
     resumeCloudinaryUrl = await uploadOnCloudinary(resumeLocalPath);
     if (!resumeCloudinaryUrl) {
-      throw new ApiError(500, "could not upload it on cloudinary");
+      next(new ApiError(400, "Could not upload it on cloudinary"));
     }
   } else {
-    throw new ApiError(400, "Please upload resume");
+    next(new ApiError(400, "Please upload resume"));
   }
 
   const resume = resumeCloudinaryUrl.url;
@@ -92,7 +93,7 @@ export const registerJobSeeker = asyncHandler(async (req, res) => {
   });
 
   if (existingUser) {
-    throw new ApiError(400, "User already exists");
+    next(new ApiError(400, "User already exists"));
   }
   const hashedPassword = await bcryptjs.hash(password, 10);
 
@@ -109,9 +110,7 @@ export const registerJobSeeker = asyncHandler(async (req, res) => {
     },
   });
   // create jobseeker
-  console.log(skills);
   const newskill = skills.split(",");
-  console.log(newskill);
   const jobseeker = await prisma.jobSeeker.create({
     data: {
       education,
@@ -126,7 +125,7 @@ export const registerJobSeeker = asyncHandler(async (req, res) => {
     },
   });
   if (!jobseeker) {
-    throw new ApiError(400, "Job seeker cannot be created");
+    next(new ApiError(400, "JobSeeker cannot be created"));
   }
   const payload = {
     id: user.id,
@@ -149,6 +148,7 @@ export const registerJobSeeker = asyncHandler(async (req, res) => {
           username: user.username,
           email: user.email,
           jobSeeker: {
+            id: jobseeker.id,
             resume: jobseeker.resume,
             experience: jobseeker.experience,
             education: jobseeker.education,
@@ -160,7 +160,7 @@ export const registerJobSeeker = asyncHandler(async (req, res) => {
     );
 });
 
-export const logoutJobSeeker = asyncHandler(async (req, res) => {
+export const logoutJobSeeker = asyncHandler(async (req, res, next) => {
   const options = {
     httpOnly: true,
     secure: true,
@@ -170,49 +170,71 @@ export const logoutJobSeeker = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, "Logout sucessfully", {}));
 });
 
-export const getCurrentJobSeeker = asyncHandler((req, res) => {
+export const getCurrentJobSeeker = asyncHandler((req, res, next) => {
   res.status(200).json(new ApiResponse(200, "Current User", req.user));
 });
 
-export const updateJobSeekerAccountDetails = asyncHandler(async (req, res) => {
-  const { education, experience, skills } = req.body;
-
-  if (!education && !experience && !skills) {
-    throw new ApiError(400, "All fields are required");
-  }
-  const resumeLocalPath = req.file?.path;
-  let resumeCloudinaryUrl;
-  if (resumeLocalPath) {
-    resumeCloudinaryUrl = await uploadOnCloudinary(resumeLocalPath);
-    if (!resumeCloudinaryUrl) {
-      throw new ApiError(500, "could not upload it on cloudinary");
+export const updateJobSeekerAccountDetails = asyncHandler(
+  async (req, res, next) => {
+    const { id } = req.params;
+    if (!id) {
+      next(new ApiError(400, "Id is required"));
     }
-  } else {
-    throw new ApiError(400, "Please upload resume");
-  }
+    const jobseekerexists = await prisma.jobSeeker.findUnique({
+      where: {
+        id: Number(id),
+      },
+    });
+    if (!jobseekerexists) {
+      next(new ApiError(400, "Id is invalid. No JobSeeker found"));
+    }
+    if (jobseekerexists.id !== req.user.jobSeeker.id) {
+      next(new ApiError(400, "You are not authorized to perform this action"));
+    }
+    const { education, experience, skills } = req.body;
 
-  const resume = resumeCloudinaryUrl.url;
-  const user = await prisma.user.findFirst({
-    where: {
-      id: req.user.id,
-    },
-  });
-  if (!user) {
-    throw new ApiError(404, "User not found");
+    if (!education && !experience && !skills) {
+      next(new ApiError(400, "All fields are required"));
+    }
+    const resumeLocalPath = req.file?.path;
+    let resumeCloudinaryUrl;
+    if (resumeLocalPath) {
+      resumeCloudinaryUrl = await uploadOnCloudinary(resumeLocalPath);
+      if (!resumeCloudinaryUrl) {
+        next(new ApiError(400, "Could not upload it on cloudinary"));
+      }
+    } else {
+      next(new ApiError(400, "Please upload resume"));
+    }
+    const resume = resumeCloudinaryUrl.url;
+    const newskill = skills.split(",");
+    const updatedUser = await prisma.jobSeeker.update({
+      where: {
+        id: req.user.jobSeeker.id,
+      },
+      data: {
+        resume,
+        education,
+        experience,
+        skills: newskill,
+      },
+    });
+
+    res.status(200).json(
+      new ApiResponse(200, "User updated successfully", {
+        user: {
+          id: req.user.id,
+          username: req.user.username,
+          email: req.user.email,
+          jobSeeker: {
+            id: updatedUser.id,
+            resume: updatedUser.resume,
+            experience: updatedUser.experience,
+            education: updatedUser.education,
+            skills: updatedUser.skills,
+          },
+        },
+      })
+    );
   }
-  const updatedUser = await prisma.user.update({
-    where: {
-      id: req.user.id,
-    },
-    data: {
-      resume,
-      education,
-      experience,
-      skills,
-    },
-    include: { jobSeeker: true },
-  });
-  res
-    .status(200)
-    .json(new ApiResponse(200, "User updated successfully", updatedUser));
-});
+);

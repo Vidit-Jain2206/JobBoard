@@ -3,7 +3,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/AsyncHandler.js";
 
-export const getAllListings = asyncHandler(async (req, res) => {
+export const getAllListings = asyncHandler(async (req, res, next) => {
   const listings = await prisma.jobListing.findMany({
     include: { company: true },
   });
@@ -11,7 +11,7 @@ export const getAllListings = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, "Listings fetched successfully", listings));
 });
-export const createListing = asyncHandler(async (req, res) => {
+export const createListing = asyncHandler(async (req, res, next) => {
   const {
     title,
     description,
@@ -30,7 +30,7 @@ export const createListing = asyncHandler(async (req, res) => {
     !startDate &&
     !location
   ) {
-    throw new ApiError(400, "All fields are required");
+    next(new ApiError(400, "All fields are required"));
   }
   const companyid = req.user?.company?.id;
   const company = await prisma.company.findFirst({
@@ -39,7 +39,7 @@ export const createListing = asyncHandler(async (req, res) => {
     },
   });
   if (!company) {
-    throw new ApiError(400, "company not found");
+    next(new ApiError(400, "Company not found"));
   }
 
   const listing = await prisma.jobListing.create({
@@ -62,15 +62,15 @@ export const createListing = asyncHandler(async (req, res) => {
     },
   });
   if (!listing) {
-    throw new ApiError(400, "Listing not created");
+    next(new ApiError(400, "Listing can not created"));
   }
   res.status(200).json(new ApiResponse(200, "Lisitng created", listing));
 });
-export const getListing = asyncHandler(async (req, res) => {
+export const getListing = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
   const listingId = Number(id);
   if (!id) {
-    throw new ApiError(400, "id is required");
+    next(new ApiError(400, "Id is required"));
   }
   const listing = await prisma.jobListing.findUnique({
     where: { id: listingId },
@@ -79,17 +79,17 @@ export const getListing = asyncHandler(async (req, res) => {
     },
   });
   if (!listing) {
-    throw new ApiError(404, "Listing not found");
+    next(new ApiError(400, "Listing not found"));
   }
   res
     .status(200)
     .json(new ApiResponse(200, "Listing fetched successfully", listing));
 });
-export const updateListing = asyncHandler(async (req, res) => {
+export const updateListing = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
   const listingId = Number(id);
   if (!id) {
-    throw new ApiError(400, "id is required");
+    next(new ApiError(400, "Id is required "));
   }
 
   const {
@@ -110,7 +110,7 @@ export const updateListing = asyncHandler(async (req, res) => {
     !startDate &&
     !location
   ) {
-    throw new ApiError(400, "All fields are required");
+    next(new ApiError(400, "All fields are required"));
   }
   const companyid = req.user.company.id;
   const company = await prisma.company.findFirst({
@@ -119,7 +119,7 @@ export const updateListing = asyncHandler(async (req, res) => {
     },
   });
   if (!company) {
-    throw new ApiError(400, "company not found");
+    next(new ApiError(400, "Company not found"));
   }
 
   const listing = await prisma.jobListing.findFirst({
@@ -128,7 +128,7 @@ export const updateListing = asyncHandler(async (req, res) => {
     },
   });
   if (listing.company_id !== companyid) {
-    throw new ApiError(400, "You are not authorized to update this listing");
+    next(new ApiError(400, "You are not authorize to update this listing"));
   }
   const updatedListing = await prisma.jobListing.update({
     where: {
@@ -148,15 +148,15 @@ export const updateListing = asyncHandler(async (req, res) => {
     },
   });
   if (!updateListing) {
-    throw new ApiError(400, "Listing not updated");
+    next(new ApiError(400, "Listing can not be  updated"));
   }
   res.status(200).json(new ApiResponse(200, "Listing updated", updatedListing));
 });
-export const deleteListing = asyncHandler(async (req, res) => {
+export const deleteListing = asyncHandler(async (req, res, next) => {
   const { id } = req.params;
   const listingId = Number(id);
   if (!id) {
-    throw new ApiError(400, "id is required");
+    next(new ApiError(400, "Id is required"));
   }
   const listing = await prisma.jobListing.findFirst({
     where: {
@@ -167,7 +167,7 @@ export const deleteListing = asyncHandler(async (req, res) => {
     },
   });
   if (!listing) {
-    throw new ApiError(404, "Listing not found");
+    next(new ApiError(400, "Listing not found"));
   }
   const companyid = req.user.company.id;
   const company = await prisma.company.findFirst({
@@ -176,27 +176,28 @@ export const deleteListing = asyncHandler(async (req, res) => {
     },
   });
   if (!company) {
-    throw new ApiError(400, "company not found");
+    next(new ApiError(400, "Company not found"));
   }
   if (listing.company.id !== company.id) {
-    throw new ApiError(400, "You are not authorized to delete this listing");
+    next(new ApiError(400, "You are not authorize to delete this listing"));
   }
-
+  const deleteApplications = await prisma.jobApplication.deleteMany({
+    where: {
+      jobListing_id: listingId,
+    },
+  });
   const deletedListing = await prisma.jobListing.delete({
     where: {
       id: listingId,
     },
   });
-  const deleteApplications = await prisma.jobApplication.delete({
-    id: listingId,
-  });
 
   if (!deletedListing && !deleteApplications) {
-    throw new ApiError(400, "Listing not deleted");
+    next(new ApiError(400, "Listing cannot be deleted"));
   }
   res.status(200).json(new ApiResponse(200, "Listing deleted", deletedListing));
 });
-export const getAllMyJobListings = asyncHandler(async (req, res) => {
+export const getAllMyJobListings = asyncHandler(async (req, res, next) => {
   const listings = await prisma.jobListing.findMany({
     where: { company_id: req.user.company.id },
     select: {
@@ -211,27 +212,22 @@ export const getAllMyJobListings = asyncHandler(async (req, res) => {
       location: true,
       jobApplication: {
         select: {
-          user: {
-            select: {
-              username: true,
-              email: true,
-            },
-          },
+          jobSeeker: true,
           jobListing: true,
         },
       },
     },
   });
-
+  if (!listings) {
+    next(new ApiError(400, "Listing not found"));
+  }
   const newListings = listings.map((listing) => {
     return {
       ...listing,
       applicationCount: listing.jobApplication.length,
     };
   });
-  if (!listings) {
-    throw new ApiError(404, "Listings not found");
-  }
+
   res
     .status(200)
     .json(new ApiResponse(200, "Listings fetched successfully", newListings));

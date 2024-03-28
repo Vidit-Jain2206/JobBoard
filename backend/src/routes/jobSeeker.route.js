@@ -21,7 +21,7 @@ jobSeekerRouter.get(
   getCurrentJobSeeker
 );
 jobSeekerRouter.patch(
-  "/update_job_seeker_details",
+  "/update_job_seeker_details/:id",
   verifyJWT,
   authorizeJobSeeker,
   upload.single("resume"),

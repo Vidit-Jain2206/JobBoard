@@ -60,8 +60,7 @@ CREATE TABLE "JobListing" (
 -- CreateTable
 CREATE TABLE "JobApplication" (
     "id" SERIAL NOT NULL,
-    "applicationDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "user_id" INTEGER NOT NULL,
+    "jobSeeker_id" INTEGER NOT NULL,
     "jobListing_id" INTEGER NOT NULL,
 
     CONSTRAINT "JobApplication_pkey" PRIMARY KEY ("id")
@@ -83,7 +82,7 @@ CREATE UNIQUE INDEX "JobSeeker_user_id_key" ON "JobSeeker"("user_id");
 CREATE UNIQUE INDEX "Company_user_id_key" ON "Company"("user_id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "JobApplication_user_id_jobListing_id_key" ON "JobApplication"("user_id", "jobListing_id");
+CREATE UNIQUE INDEX "JobApplication_jobSeeker_id_jobListing_id_key" ON "JobApplication"("jobSeeker_id", "jobListing_id");
 
 -- AddForeignKey
 ALTER TABLE "User" ADD CONSTRAINT "User_role_id_fkey" FOREIGN KEY ("role_id") REFERENCES "Role"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -98,7 +97,7 @@ ALTER TABLE "Company" ADD CONSTRAINT "Company_user_id_fkey" FOREIGN KEY ("user_i
 ALTER TABLE "JobListing" ADD CONSTRAINT "JobListing_company_id_fkey" FOREIGN KEY ("company_id") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "JobApplication" ADD CONSTRAINT "JobApplication_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "JobApplication" ADD CONSTRAINT "JobApplication_jobSeeker_id_fkey" FOREIGN KEY ("jobSeeker_id") REFERENCES "JobSeeker"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "JobApplication" ADD CONSTRAINT "JobApplication_jobListing_id_fkey" FOREIGN KEY ("jobListing_id") REFERENCES "JobListing"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
